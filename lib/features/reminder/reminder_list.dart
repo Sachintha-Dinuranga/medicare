@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert'; // For encoding and decoding JSON
 import 'package:intl/intl.dart';
 import 'package:medicare/features/reminder/add_reminder.dart';
 
@@ -21,19 +22,28 @@ class _ReminderListState extends State<ReminderList> {
     _loadReminders();
   }
 
-  void _loadReminders() {
-    final box = Hive.box('reminders');
+  // Method to load reminders from SharedPreferences
+  Future<void> _loadReminders() async {
+    final prefs = await SharedPreferences.getInstance();
+    List<String> savedReminders =
+        prefs.getStringList('reminders') ?? []; // Ensure it's a list
+
     setState(() {
-      reminders = List<Map<String, dynamic>>.from(box.toMap().values);
+      reminders = savedReminders
+          .map((reminder) => jsonDecode(reminder))
+          .toList()
+          .cast<Map<String, dynamic>>();
     });
   }
 
-  void _saveReminders() {
-    final box = Hive.box('reminders');
-    box.clear(); // Clear existing reminders
-    for (var reminder in reminders) {
-      box.add(reminder); // Save each reminder to the box
-    }
+  // Method to save reminders to SharedPreferences
+  Future<void> _saveReminders() async {
+    final prefs = await SharedPreferences.getInstance();
+    List<String> remindersString = reminders
+        .map((reminder) => jsonEncode(reminder)) // Convert to JSON strings
+        .toList();
+
+    await prefs.setStringList('reminders', remindersString); // Save as list
   }
 
   // Method to delete a reminder
@@ -110,7 +120,7 @@ class _ReminderListState extends State<ReminderList> {
                         ),
                         direction: DismissDirection.startToEnd,
                         onDismissed: (direction) {
-                          _deleteReminder(index);
+                          _deleteReminder(reminders.indexOf(reminder));
                         },
                         child: Container(
                           margin: const EdgeInsets.symmetric(
@@ -139,7 +149,7 @@ class _ReminderListState extends State<ReminderList> {
                               ),
                             ),
                             subtitle: Text(
-                              'Date: ${DateFormat('yyyy-MM-dd').format(reminder['date'])} - Time: ${reminder['time'].format(context)}',
+                              'Date: ${DateFormat('yyyy-MM-dd').format(DateTime.fromMillisecondsSinceEpoch(reminder['date']))} - Time: ${TimeOfDay(hour: reminder['time']['hour'], minute: reminder['time']['minute']).format(context)}',
                               style: const TextStyle(
                                   color: Colors
                                       .black54), // Lighter color for subtitle
@@ -147,9 +157,12 @@ class _ReminderListState extends State<ReminderList> {
                             trailing: Text(
                               reminder['priority'],
                               style: TextStyle(
-                                  color: reminder['priority'] == 'High'
-                                      ? Colors.red
-                                      : Colors.blue),
+                                color: reminder['priority'] == 'High'
+                                    ? Colors.red
+                                    : reminder['priority'] == 'Medium'
+                                        ? Colors.orange
+                                        : Colors.green,
+                              ),
                             ),
                           ),
                         ),
@@ -168,7 +181,7 @@ class _ReminderListState extends State<ReminderList> {
           );
 
           // If a new reminder is returned, add it to the list
-          if (result != null) {
+          if (result != null && result is Map<String, dynamic>) {
             setState(() {
               reminders.add(result); // Add the new reminder to the list
               _saveReminders(); // Save the updated list

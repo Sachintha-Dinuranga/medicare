@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert'; // For encoding and decoding JSON
 // import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 // import 'package:medicare/features/reminder/reminder_list.dart';
 
@@ -22,12 +24,13 @@ class _AddReminderState extends State<AddReminder> {
   String priority = 'Low'; // Default value
   String instructions = '';
 
-  // List<Map<String, dynamic>> reminders = [];
+  List<Map<String, dynamic>> reminders = [];
 
   // Format date and time for display
   // String formatDate(DateTime date) => DateFormat('yyyy-MM-dd').format(date);
   // String formatTime(TimeOfDay time) => time.format(context);
 
+  // Function to submit the form
   // Function to submit the form
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
@@ -38,16 +41,33 @@ class _AddReminderState extends State<AddReminder> {
         'name': medicationName,
         'dosage': dosage,
         'frequency': frequency,
-        'date': selectedDate,
-        'time': selectedTime,
+        'date': selectedDate.millisecondsSinceEpoch,
+        'time': {
+          'hour': selectedTime.hour,
+          'minute': selectedTime.minute,
+        },
         'priority': priority,
         'instructions': instructions,
       };
 
-      // Return the new reminder to the previous page
+      // Pop the current screen
       Navigator.pop(context, newReminder);
     }
   }
+
+  // Function to save reminders in SharedPreferences
+  // Future<void> _saveReminder(Map<String, dynamic> newReminder) async {
+  //   final prefs = await SharedPreferences.getInstance();
+
+  //   // Get the existing reminders
+  //   List<String>? savedReminders = prefs.getStringList('reminders') ?? [];
+
+  //   // Add the new reminder (converted to JSON string)
+  //   savedReminders.add(jsonEncode(newReminder));
+
+  //   // Save the updated list back to SharedPreferences
+  //   await prefs.setStringList('reminders', savedReminders);
+  // }
 
   // Function to pick date
   Future<void> _selectDate(BuildContext context) async {
@@ -182,6 +202,7 @@ class _AddReminderState extends State<AddReminder> {
                   ElevatedButton(
                     onPressed: () {
                       _formKey.currentState!.reset();
+                      Navigator.pop(context);
                     },
                     child: const Text('Cancel'),
                     style: ElevatedButton.styleFrom(
