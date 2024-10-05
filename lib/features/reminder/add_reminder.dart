@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:convert'; // For encoding and decoding JSON
+// import 'package:shared_preferences/shared_preferences.dart';
+// import 'dart:convert'; // For encoding and decoding JSON
 // import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 // import 'package:medicare/features/reminder/reminder_list.dart';
 
@@ -101,7 +101,8 @@ class _AddReminderState extends State<AddReminder> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Add Medication Reminder'),
+        title: const Text('Add Reminders'),
+        centerTitle: true,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -111,7 +112,14 @@ class _AddReminderState extends State<AddReminder> {
             children: [
               // Medication Name
               TextFormField(
-                decoration: const InputDecoration(labelText: 'Medication Name'),
+                decoration: InputDecoration(
+                  labelText: 'Medication Name',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter medication name';
@@ -122,10 +130,18 @@ class _AddReminderState extends State<AddReminder> {
                   medicationName = value!;
                 },
               ),
+              const SizedBox(height: 16),
 
               // Dosage
               TextFormField(
-                decoration: const InputDecoration(labelText: 'Dosage'),
+                decoration: InputDecoration(
+                  labelText: 'Dosage',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter dosage';
@@ -136,10 +152,18 @@ class _AddReminderState extends State<AddReminder> {
                   dosage = value!;
                 },
               ),
+              const SizedBox(height: 16),
 
               // Frequency
               TextFormField(
-                decoration: const InputDecoration(labelText: 'Frequency'),
+                decoration: InputDecoration(
+                  labelText: 'Frequency',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter frequency';
@@ -150,26 +174,36 @@ class _AddReminderState extends State<AddReminder> {
                   frequency = value!;
                 },
               ),
+              const SizedBox(height: 16),
 
-              // Date
+              // Date picker
               ListTile(
                 title: Text(
                     "Date: ${DateFormat('yyyy-MM-dd').format(selectedDate)}"),
                 trailing: const Icon(Icons.calendar_today),
                 onTap: () => _selectDate(context),
               ),
+              const SizedBox(height: 16),
 
-              // Time
+              // Time picker
               ListTile(
                 title: Text("Time: ${selectedTime.format(context)}"),
                 trailing: const Icon(Icons.access_time),
                 onTap: () => _selectTime(context),
               ),
+              const SizedBox(height: 16),
 
               // Priority Level
               DropdownButtonFormField<String>(
                 value: priority,
-                decoration: const InputDecoration(labelText: 'Priority'),
+                decoration: InputDecoration(
+                  labelText: 'Priority',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                ),
                 items: ['High', 'Medium', 'Low'].map((String value) {
                   return DropdownMenuItem<String>(
                     value: value,
@@ -185,15 +219,24 @@ class _AddReminderState extends State<AddReminder> {
                   priority = value!;
                 },
               ),
+              const SizedBox(height: 16),
 
               // Additional Instructions
               TextFormField(
-                decoration:
-                    const InputDecoration(labelText: 'Additional Instructions'),
+                decoration: InputDecoration(
+                  labelText: 'Additional Instructions',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+                ),
+                maxLines: 4,
                 onSaved: (value) {
                   instructions = value ?? '';
                 },
               ),
+              const SizedBox(height: 24),
 
               // Buttons: Cancel and Submit
               Row(
@@ -204,13 +247,26 @@ class _AddReminderState extends State<AddReminder> {
                       _formKey.currentState!.reset();
                       Navigator.pop(context);
                     },
-                    child: const Text('Cancel'),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red,
+                      backgroundColor: Colors.redAccent,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
+                    child: const Text('Cancel'),
                   ),
                   ElevatedButton(
                     onPressed: _submitForm,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blueAccent,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
                     child: const Text('Submit'),
                   ),
                 ],

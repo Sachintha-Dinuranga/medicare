@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert'; // For encoding and decoding JSON
 import 'package:intl/intl.dart';
 import 'package:medicare/features/reminder/add_reminder.dart';
+import 'package:table_calendar/table_calendar.dart';
 
 class ReminderList extends StatefulWidget {
   const ReminderList({super.key});
@@ -14,7 +15,10 @@ class ReminderList extends StatefulWidget {
 class _ReminderListState extends State<ReminderList> {
   // Move the reminders list into the widget's state
   List<Map<String, dynamic>> reminders = [];
+  List<Map<String, dynamic>> filteredDateReminders = [];
+  bool isCalendarVisible = false; // Manage calendar visibility
   String searchQuery = ''; // Variable to hold the search query
+  DateTime? selectedDate; // Variable to hold the selected date
 
   @override
   void initState() {
@@ -46,6 +50,37 @@ class _ReminderListState extends State<ReminderList> {
     await prefs.setStringList('reminders', remindersString); // Save as list
   }
 
+  // Method to show a confirmation dialog before deleting
+  Future<void> _confirmDelete(BuildContext context, int index) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible:
+          false, // Prevent dismissing by tapping outside the dialog
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Confirm Deletion'),
+          content: const Text('Are you sure you want to delete this reminder?'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context)
+                    .pop(); // Close the dialog without deleting
+              },
+            ),
+            TextButton(
+              child: const Text('Yes'),
+              onPressed: () {
+                _deleteReminder(index); // Proceed with deletion
+                Navigator.of(context).pop(); // Close the dialog after deletion
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   // Method to delete a reminder
   void _deleteReminder(int index) {
     setState(() {
@@ -59,6 +94,9 @@ class _ReminderListState extends State<ReminderList> {
 
   // Method to filter reminders based on search query
   List<Map<String, dynamic>> get filteredReminders {
+    if (selectedDate != null) {
+      return filteredDateReminders;
+    }
     if (searchQuery.isEmpty) {
       return reminders;
     } else {
@@ -73,33 +111,149 @@ class _ReminderListState extends State<ReminderList> {
     }
   }
 
+// Method to filter reminders based on selected date
+  void _filterRemindersByDate(DateTime selectedDate) {
+    setState(() {
+      filteredDateReminders = reminders.where((reminder) {
+        DateTime reminderDate =
+            DateTime.fromMillisecondsSinceEpoch(reminder['date']);
+        return reminderDate.year == selectedDate.year &&
+            reminderDate.month == selectedDate.month &&
+            reminderDate.day == selectedDate.day;
+      }).toList();
+    });
+  }
+
+  //calendar
+  // Show calendar dialog
+  void _showCalendarDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          content: Container(
+            width: double.maxFinite,
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SizedBox(
+                    height: 400,
+                    width: double.maxFinite,
+                    child: TableCalendar(
+                      firstDay: DateTime(2000),
+                      lastDay: DateTime(2100),
+                      focusedDay: DateTime.now(),
+                      calendarFormat: CalendarFormat.month,
+                      onDaySelected: (selectedDay, focusedDay) {
+                        setState(() {
+                          selectedDate = selectedDay;
+                          _filterRemindersByDate(selectedDay);
+                        });
+                        Navigator.pop(context); // Close calendar dialog
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+  // // Method to filter reminders based on selected date
+  // void _filterRemindersByDate(DateTime selectedDate) {
+  //   setState(() {
+  //     filteredDateReminders = reminders.where((reminder) {
+  //       DateTime reminderDate =
+  //           DateTime.fromMillisecondsSinceEpoch(reminder['date']);
+  //       return reminderDate.year == selectedDate.year &&
+  //           reminderDate.month == selectedDate.month &&
+  //           reminderDate.day == selectedDate.day;
+  //     }).toList();
+  //   });
+  // }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Reminders'),
+        title: const Text('Reminder List'),
         centerTitle: true,
       ),
       body: Column(
         children: [
-          // Search Bar
+          // Search Bar and Calendar Icon
           Padding(
             padding: const EdgeInsets.all(16.0),
-            child: TextField(
-              onChanged: (value) {
-                setState(() {
-                  searchQuery = value; // Update the search query
-                });
-              },
-              decoration: InputDecoration(
-                labelText: 'Search Reminders',
-                prefixIcon: const Icon(Icons.search),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10.0),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    onChanged: (value) {
+                      setState(() {
+                        searchQuery = value; // Update the search query
+                      });
+                    },
+                    decoration: InputDecoration(
+                      labelText: 'Search Reminders',
+                      labelStyle: const TextStyle(
+                          color: Colors.black), // Label text color
+                      prefixIcon: const Icon(Icons.search,
+                          color: Colors.black), // Icon color
+                      filled: true, // Enable fill
+                      fillColor:
+                          Colors.blue[300], // Set background color to blue
+                      border: OutlineInputBorder(
+                        borderRadius:
+                            BorderRadius.circular(20.0), // Rounded corners
+                        borderSide:
+                            BorderSide.none, // No border for the default state
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius:
+                            BorderRadius.circular(20.0), // Rounded corners
+                        borderSide: const BorderSide(
+                            color: Colors.blue,
+                            width: 2.0), // Blue border when focused
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                          vertical: 10.0,
+                          horizontal: 16.0), // Padding inside the field
+                    ),
+                    cursorColor: Colors.white, // Change cursor color
+                  ),
                 ),
-              ),
+                // Calendar Icon Button
+                IconButton(
+                  icon: const Icon(Icons.calendar_today, color: Colors.blue),
+                  onPressed: () {
+                    _showCalendarDialog(); // Show calendar dialog
+                  },
+                ),
+              ],
             ),
           ),
+          //clear filter button
+          if (filteredDateReminders
+              .isNotEmpty) // Only show if there are filtered results
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: ElevatedButton(
+                onPressed: () {
+                  setState(() {
+                    filteredDateReminders.clear(); // Clear filtered reminders
+                  });
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red, // Customize button color
+                ),
+                child: const Text('Clear Filter'),
+              ),
+            ),
+
+          // Conditionally show calendar
           // Reminder List
           Expanded(
             child: filteredReminders.isEmpty
@@ -118,9 +272,12 @@ class _ReminderListState extends State<ReminderList> {
                           alignment: Alignment.centerLeft,
                           child: const Icon(Icons.delete, color: Colors.white),
                         ),
-                        direction: DismissDirection.startToEnd,
-                        onDismissed: (direction) {
-                          _deleteReminder(reminders.indexOf(reminder));
+                        direction: DismissDirection.endToStart,
+                        confirmDismiss: (direction) async {
+                          // Trigger confirmation dialog
+                          await _confirmDelete(
+                              context, reminders.indexOf(reminder));
+                          return false; // Prevent auto-dismissal as the confirmation dialog handles it
                         },
                         child: Container(
                           margin: const EdgeInsets.symmetric(
