@@ -175,6 +175,28 @@ class _ReminderListState extends State<ReminderList> {
   //   });
   // }
 
+  // Method to edit reminder
+  Future<void> _editReminder(BuildContext context, int index) async {
+    final reminder = reminders[index]; // Get current reminder details
+
+    // Navigate to AddReminder with current details
+    final updatedReminder = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => AddReminder(
+          existingReminder: reminder,
+        ),
+      ),
+    );
+
+    if (updatedReminder != null && updatedReminder is Map<String, dynamic>) {
+      setState(() {
+        reminders[index] = updatedReminder; // Update the reminder
+        _saveReminders(); // Save to SharedPreferences
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -236,20 +258,21 @@ class _ReminderListState extends State<ReminderList> {
             ),
           ),
           //clear filter button
-          if (filteredDateReminders
-              .isNotEmpty) // Only show if there are filtered results
+          if (selectedDate != null)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: ElevatedButton(
                 onPressed: () {
                   setState(() {
+                    selectedDate = null; // Reset the selected date
                     filteredDateReminders.clear(); // Clear filtered reminders
                   });
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red, // Customize button color
+                  backgroundColor: Colors.red[300], // Customize button color
                 ),
-                child: const Text('Clear Filter'),
+                child: const Text('Clear Filter',
+                    style: TextStyle(color: Colors.black)),
               ),
             ),
 
@@ -272,12 +295,24 @@ class _ReminderListState extends State<ReminderList> {
                           alignment: Alignment.centerLeft,
                           child: const Icon(Icons.delete, color: Colors.white),
                         ),
-                        direction: DismissDirection.endToStart,
+                        secondaryBackground: Container(
+                          color: Colors.green,
+                          padding: const EdgeInsets.only(right: 16),
+                          alignment: Alignment.centerRight,
+                          child: const Icon(Icons.edit, color: Colors.white),
+                        ),
+                        direction: DismissDirection.horizontal,
                         confirmDismiss: (direction) async {
-                          // Trigger confirmation dialog
-                          await _confirmDelete(
-                              context, reminders.indexOf(reminder));
-                          return false; // Prevent auto-dismissal as the confirmation dialog handles it
+                          if (direction == DismissDirection.startToEnd) {
+                            // Trigger delete confirmation dialog
+                            await _confirmDelete(
+                                context, reminders.indexOf(reminder));
+                          } else if (direction == DismissDirection.endToStart) {
+                            // Open edit form when swiped from start to end
+                            await _editReminder(
+                                context, reminders.indexOf(reminder));
+                          }
+                          return false;
                         },
                         child: Container(
                           margin: const EdgeInsets.symmetric(

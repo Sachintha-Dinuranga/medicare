@@ -6,7 +6,8 @@ import 'package:intl/intl.dart';
 // import 'package:medicare/features/reminder/reminder_list.dart';
 
 class AddReminder extends StatefulWidget {
-  const AddReminder({super.key});
+  final Map<String, dynamic>? existingReminder;
+  const AddReminder({super.key, this.existingReminder});
 
   @override
   State<AddReminder> createState() => _AddReminderState();
@@ -32,6 +33,24 @@ class _AddReminderState extends State<AddReminder> {
 
   // Function to submit the form
   // Function to submit the form
+  @override
+  void initState() {
+    super.initState();
+
+    // Check if an existing reminder was passed to the form
+    if (widget.existingReminder != null) {
+      final reminder = widget.existingReminder!;
+      medicationName = reminder['name'];
+      dosage = reminder['dosage'];
+      frequency = reminder['frequency'];
+      selectedDate = DateTime.fromMillisecondsSinceEpoch(reminder['date']);
+      selectedTime = TimeOfDay(
+          hour: reminder['time']['hour'], minute: reminder['time']['minute']);
+      priority = reminder['priority'];
+      instructions = reminder['instructions'];
+    }
+  }
+
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
@@ -112,6 +131,7 @@ class _AddReminderState extends State<AddReminder> {
             children: [
               // Medication Name
               TextFormField(
+                initialValue: medicationName,
                 decoration: InputDecoration(
                   labelText: 'Medication Name',
                   border: OutlineInputBorder(
@@ -134,6 +154,7 @@ class _AddReminderState extends State<AddReminder> {
 
               // Dosage
               TextFormField(
+                initialValue: dosage,
                 decoration: InputDecoration(
                   labelText: 'Dosage',
                   border: OutlineInputBorder(
@@ -156,6 +177,7 @@ class _AddReminderState extends State<AddReminder> {
 
               // Frequency
               TextFormField(
+                initialValue: frequency,
                 decoration: InputDecoration(
                   labelText: 'Frequency',
                   border: OutlineInputBorder(
@@ -223,6 +245,7 @@ class _AddReminderState extends State<AddReminder> {
 
               // Additional Instructions
               TextFormField(
+                initialValue: instructions,
                 decoration: InputDecoration(
                   labelText: 'Additional Instructions',
                   border: OutlineInputBorder(
