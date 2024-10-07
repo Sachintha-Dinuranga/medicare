@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:medicare/features/reminder/notification_service.dart';
 // import 'package:shared_preferences/shared_preferences.dart';
 // import 'dart:convert'; // For encoding and decoding JSON
 // import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
@@ -68,6 +69,30 @@ class _AddReminderState extends State<AddReminder> {
         'priority': priority,
         'instructions': instructions,
       };
+
+      DateTime scheduledTime = DateTime(
+        selectedDate.year,
+        selectedDate.month,
+        selectedDate.day,
+        selectedTime.hour,
+        selectedTime.minute,
+      );
+
+      if (scheduledTime.isBefore(DateTime.now())) {
+        // Show an error if the selected time is in the past
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Scheduled time cannot be in the past")),
+        );
+        return;
+      }
+
+      // Schedule the notification
+      NotificationService.scheduleNotification(
+        'Medication Reminder',
+        'It\'s time to take $medicationName',
+        scheduledTime,
+        priority,
+      );
 
       // Pop the current screen
       Navigator.pop(context, newReminder);
