@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:logger/logger.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:medicare/features/map_feature/database_helper.dart';
 
 class FirstScreen extends StatefulWidget {
   const FirstScreen({super.key});
@@ -24,11 +25,17 @@ class _FirstScreenState extends State<FirstScreen> {
   final Logger _logger = Logger();
   bool _showOverview = false;
   List _locationSummaries = [];
+  List<Map<String, dynamic>> savedLocations = [];
 
   @override
   void initState() {
     super.initState();
     _checkPermissionAndGetLocation();
+    _loadLocations();
+    if (SavedLocationsPopup.change) {
+      _loadLocations();
+      SavedLocationsPopup.change = false;      
+    }
   }
 
   Future<void> _checkPermissionAndGetLocation() async {
@@ -216,6 +223,100 @@ class _FirstScreenState extends State<FirstScreen> {
     );
   }
 
+  // Load saved locations from SQLite database
+  Future<void> _loadLocations() async {
+    List<Map<String, dynamic>> locations =
+        await DatabaseHelper.instance.getAllLocations();
+    setState(() {
+      savedLocations = locations;
+    });
+  }
+
+  void _editLocation(int id, String newName) {
+    DatabaseHelper.instance.updateLocation(id, newName);
+    _loadLocations();
+  }
+
+  void _deleteLocation(int id) {
+    DatabaseHelper.instance.deleteLocation(id);
+    _loadLocations();
+  }
+
+  void _addNewLocation(String name) {
+    DatabaseHelper.instance.insertLocation(name, _initialPosition.latitude,
+        _initialPosition.longitude); // Example coordinates (San Francisco)
+    _loadLocations();
+  }
+
+  void _showSavedLocations() {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return SavedLocationsPopup(
+          locations: savedLocations,
+          onEdit: _editLocation,
+          onDelete: _deleteLocation,
+          onClose: () => Navigator.of(context).pop(),
+        );
+      },
+    );
+  }
+
+  // Function to show the long press dialog for adding new location
+  void _showAddLocationDialog() {
+    TextEditingController locationController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Add New Location'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: locationController,
+                decoration: const InputDecoration(
+                  labelText: 'Location Name',
+                  hintText: 'Enter location name',
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () async {
+                String locationName = locationController.text;
+                if (locationName.isNotEmpty) {
+                  DatabaseHelper.instance.insertLocation(
+                      locationName,
+                      _initialPosition.latitude,
+                      _initialPosition
+                          .longitude); // Example coordinates (San Francisco)
+                  _loadLocations();
+                  Navigator.of(context).pop();
+                } else {
+                  // If location name is empty, show a warning
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Location name cannot be empty!')),
+                  );
+                }
+              },
+              child: const Text('Save'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
@@ -279,7 +380,6 @@ class _FirstScreenState extends State<FirstScreen> {
                 ),
               ),
             ),
-
             Positioned(
               top: 140.0,
               right: 10.0,
@@ -288,7 +388,7 @@ class _FirstScreenState extends State<FirstScreen> {
                   await _checkPermissionAndGetLocation();
                 },
                 child: Opacity(
-                  opacity: 0.4, 
+                  opacity: 0.4,
                   child: Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
@@ -303,15 +403,14 @@ class _FirstScreenState extends State<FirstScreen> {
                 ),
               ),
             ),
-
             Positioned(
               top: 200.0,
               right: 10.0,
               child: GestureDetector(
-                onTap: () {},
-                onLongPress: () {},
+                onTap: _showSavedLocations,
+                onLongPress: _showAddLocationDialog,
                 child: Opacity(
-                  opacity: 0.4, 
+                  opacity: 0.4,
                   child: Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
@@ -326,14 +425,12 @@ class _FirstScreenState extends State<FirstScreen> {
                 ),
               ),
             ),
-
-
             if (_showOverview)
               Positioned(
                 bottom: 0.0,
                 left: 0.0,
                 right: 0.0,
-                height: screenHeight / 3, 
+                height: screenHeight / 3,
                 child: Container(
                   color: Colors.white.withOpacity(0.9),
                   child: ListView.builder(
@@ -350,15 +447,14 @@ class _FirstScreenState extends State<FirstScreen> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Container(
-                          width: screenWidth * 0.4, 
+                          width: screenWidth * 0.4,
                           padding: const EdgeInsets.all(12),
                           child: Column(
                             children: [
                               Expanded(
                                 child: CarouselSlider(
                                   options: CarouselOptions(
-                                    height: screenHeight /
-                                        6, 
+                                    height: screenHeight / 6,
                                     viewportFraction: 1.0,
                                     enlargeCenterPage: true,
                                   ),
@@ -418,6 +514,112 @@ class _FirstScreenState extends State<FirstScreen> {
           ],
         ),
       ),
+    );
+  }
+}
+
+class SavedLocationsPopup extends StatelessWidget {
+  final List<Map<String, dynamic>> locations;
+  final Function(int, String) onEdit;
+  final Function(int) onDelete;
+  final VoidCallback onClose;
+  static var change = false;
+
+  const SavedLocationsPopup({super.key, 
+    required this.locations,
+    required this.onEdit,
+    required this.onDelete,
+    required this.onClose,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'Saved Locations',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.close),
+                onPressed: onClose,
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Expanded(
+            child: ListView.builder(
+              itemCount: locations.length,
+              itemBuilder: (context, index) {
+                return ListTile(
+                  title: Text(locations[index]['name']),
+                  subtitle: Text(
+                      'Lat: ${locations[index]['latitude']}, Long: ${locations[index]['longitude']}'),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.edit, color: Colors.blue),
+                        onPressed: () => _editDialog(context,
+                            locations[index]['id'], locations[index]['name']),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.delete, color: Colors.red),
+                        onPressed: () =>
+                            {onDelete(locations[index]['id']),onClose},
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Function to show edit dialog
+  void _editDialog(BuildContext context, int id, String currentName) {
+    TextEditingController controller =
+        TextEditingController(text: currentName);
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Edit Location'),
+          content: TextField(
+            controller: controller,
+            decoration: const InputDecoration(hintText: 'Enter new name'),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                onEdit(id, controller.text);
+                change = true;
+                Navigator.of(context).pop();
+              },
+              child: const Text('Save'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancel'),
+            ),
+          ],
+        );
+      },
     );
   }
 }
