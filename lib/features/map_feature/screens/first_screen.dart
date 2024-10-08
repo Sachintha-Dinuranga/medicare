@@ -19,6 +19,7 @@ class _FirstScreenState extends State<FirstScreen> {
   bool _locationPermissionGranted = false;
   Marker? _origin;
   final Set<Marker> _markers = {};
+  final Set<Polyline> _polylines = {}; // To store the route polyline
   final Logger _logger = Logger();
 
   @override
@@ -73,7 +74,7 @@ class _FirstScreenState extends State<FirstScreen> {
         final data = json.decode(response.body);
         final List results = data['results'];
 
-        _logger.i('Fetched data: $results'); // Log fetched data
+        _logger.i('Fetched data: $results');
 
         setState(() {
           // Clear previous markers except current location
@@ -86,26 +87,102 @@ class _FirstScreenState extends State<FirstScreen> {
               result['geometry']['location']['lng'],
             );
 
-            // Add the medical facility marker with green color
             _markers.add(
               Marker(
                 markerId: MarkerId(result['place_id']),
                 position: hospitalPosition,
-                icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen), // Green markers
+                icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
                 infoWindow: InfoWindow(
                   title: result['name'],
                   snippet: result['vicinity'],
                 ),
+                onTap: () {
+                  _getDirections(_initialPosition, hospitalPosition);
+                },
               ),
             );
           }
         });
       } else {
-        _logger.e('Failed to fetch nearby hospitals: ${response.statusCode}'); // Log error status code
+        _logger.e('Failed to fetch nearby hospitals: ${response.statusCode}');
       }
     } catch (e) {
-      _logger.e('Error fetching nearby hospitals: $e'); // Log exception
+      _logger.e('Error fetching nearby hospitals: $e');
     }
+  }
+
+  // Get directions from current location to the selected marker (green marker)
+  Future<void> _getDirections(LatLng origin, LatLng destination) async {
+    const apiKey = 'AlzaSyOoGa5besFuSJ2dFj1Ta0MdQA7ZC6c2Y_J';
+    final url = 'https://maps.gomaps.pro/maps/api/directions/json'
+        '?origin=${origin.latitude},${origin.longitude}'
+        '&destination=${destination.latitude},${destination.longitude}'
+        '&key=$apiKey';
+
+    try {
+      final response = await http.get(Uri.parse(url));
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        final points = data['routes'][0]['overview_polyline']['points'];
+
+        _logger.i('Polyline points: $points');
+
+        _createPolyline(points);
+      } else {
+        _logger.e('Failed to fetch directions: ${response.statusCode}');
+      }
+    } catch (e) {
+      _logger.e('Error fetching directions: $e');
+    }
+  }
+
+  // Create a polyline from the directions data
+  void _createPolyline(String encodedPolyline) {
+    setState(() {
+      _polylines.clear(); // Clear existing polylines
+      _polylines.add(
+        Polyline(
+          polylineId: const PolylineId('route'),
+          width: 5,
+          color: Colors.blue,
+          points: _decodePolyline(encodedPolyline),
+        ),
+      );
+    });
+  }
+
+  // Decode the polyline points
+  List<LatLng> _decodePolyline(String encoded) {
+    List<LatLng> polylineCoordinates = [];
+    int index = 0, len = encoded.length;
+    int lat = 0, lng = 0;
+
+    while (index < len) {
+      int b, shift = 0, result = 0;
+      do {
+        b = encoded.codeUnitAt(index++) - 63;
+        result |= (b & 0x1F) << shift;
+        shift += 5;
+      } while (b >= 0x20);
+      int dlat = (result & 1) != 0 ? ~(result >> 1) : (result >> 1);
+      lat += dlat;
+
+      shift = 0;
+      result = 0;
+      do {
+        b = encoded.codeUnitAt(index++) - 63;
+        result |= (b & 0x1F) << shift;
+        shift += 5;
+      } while (b >= 0x20);
+      int dlng = (result & 1) != 0 ? ~(result >> 1) : (result >> 1);
+      lng += dlng;
+
+      final latitude = lat / 1E5;
+      final longitude = lng / 1E5;
+      polylineCoordinates.add(LatLng(latitude, longitude));
+    }
+
+    return polylineCoordinates;
   }
 
   void _showPermissionDeniedDialog() {
@@ -151,6 +228,7 @@ class _FirstScreenState extends State<FirstScreen> {
                 ),
                 myLocationEnabled: true,
                 markers: _markers,
+                polylines: _polylines, // Add polylines to the map
                 onMapCreated: (GoogleMapController controller) {
                   mapController = controller;
                 },
