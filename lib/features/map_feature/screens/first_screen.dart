@@ -19,7 +19,7 @@ class _FirstScreenState extends State<FirstScreen> {
   bool _locationPermissionGranted = false;
   Marker? _origin;
   final Set<Marker> _markers = {};
-  final Set<Polyline> _polylines = {}; // To store the route polyline
+  final Set<Polyline> _polylines = {}; 
   final Logger _logger = Logger();
 
   @override
@@ -60,12 +60,13 @@ class _FirstScreenState extends State<FirstScreen> {
     }
   }
 
+//fetch locations from gomap
   Future<void> _fetchNearbyHospitals(LatLng position) async {
     const apiKey = 'AlzaSyOoGa5besFuSJ2dFj1Ta0MdQA7ZC6c2Y_J';
     final url = 'https://maps.gomaps.pro/maps/api/place/nearbysearch/json'
         '?location=${position.latitude},${position.longitude}'
         '&radius=2000' // 2 km radius
-        '&type=hospital|doctor|pharmacy|Hospital' // Restrict to medical places
+        '&type=hospital|doctor|pharmacy|Hospital' 
         '&key=$apiKey';
 
     try {
@@ -80,7 +81,7 @@ class _FirstScreenState extends State<FirstScreen> {
           // Clear previous markers except current location
           _markers.removeWhere((marker) => marker.markerId.value != 'current-location');
           
-          // Add new markers for medical facilities
+          // marker formatting
           for (var result in results) {
             final LatLng hospitalPosition = LatLng(
               result['geometry']['location']['lat'],
@@ -111,35 +112,41 @@ class _FirstScreenState extends State<FirstScreen> {
     }
   }
 
-  // Get directions from current location to the selected marker (green marker)
+  
+  // get directions from gomap
   Future<void> _getDirections(LatLng origin, LatLng destination) async {
     const apiKey = 'AlzaSyOoGa5besFuSJ2dFj1Ta0MdQA7ZC6c2Y_J';
     final url = 'https://maps.gomaps.pro/maps/api/directions/json'
-        '?origin=${origin.latitude},${origin.longitude}'
-        '&destination=${destination.latitude},${destination.longitude}'
-        '&key=$apiKey';
+      '?origin=${origin.latitude},${origin.longitude}'
+      '&destination=${destination.latitude},${destination.longitude}'
+      '&mode=driving'  
+      '&avoid=tolls'  
+      '&traffic_model=best_guess' 
+      '&departure_time=now' 
+      '&key=$apiKey';
 
     try {
       final response = await http.get(Uri.parse(url));
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        final points = data['routes'][0]['overview_polyline']['points'];
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      final points = data['routes'][0]['overview_polyline']['points'];
 
-        _logger.i('Polyline points: $points');
+      _logger.i('Polyline points: $points');
 
-        _createPolyline(points);
-      } else {
-        _logger.e('Failed to fetch directions: ${response.statusCode}');
-      }
-    } catch (e) {
-      _logger.e('Error fetching directions: $e');
+      _createPolyline(points);
+    } else {
+      _logger.e('Failed to fetch directions: ${response.statusCode}');
     }
+  } catch (e) {
+    _logger.e('Error fetching directions: $e');
+  }
   }
 
-  // Create a polyline from the directions data
+
+//create polylines to display roads
   void _createPolyline(String encodedPolyline) {
     setState(() {
-      _polylines.clear(); // Clear existing polylines
+      _polylines.clear(); 
       _polylines.add(
         Polyline(
           polylineId: const PolylineId('route'),
@@ -151,7 +158,7 @@ class _FirstScreenState extends State<FirstScreen> {
     });
   }
 
-  // Decode the polyline points
+
   List<LatLng> _decodePolyline(String encoded) {
     List<LatLng> polylineCoordinates = [];
     int index = 0, len = encoded.length;
@@ -228,7 +235,8 @@ class _FirstScreenState extends State<FirstScreen> {
                 ),
                 myLocationEnabled: true,
                 markers: _markers,
-                polylines: _polylines, // Add polylines to the map
+                polylines: _polylines,
+                trafficEnabled: true,
                 onMapCreated: (GoogleMapController controller) {
                   mapController = controller;
                 },
