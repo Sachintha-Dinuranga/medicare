@@ -147,6 +147,7 @@ class _AddReminderState extends State<AddReminder> {
       appBar: AppBar(
         title: const Text('Add Reminders'),
         centerTitle: true,
+        backgroundColor: Colors.blue,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -162,6 +163,8 @@ class _AddReminderState extends State<AddReminder> {
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
+                  filled: true,
+                  fillColor: Colors.blue[100],
                   contentPadding:
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 ),
@@ -185,6 +188,8 @@ class _AddReminderState extends State<AddReminder> {
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
+                  filled: true,
+                  fillColor: Colors.blue[100],
                   contentPadding:
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 ),
@@ -208,6 +213,8 @@ class _AddReminderState extends State<AddReminder> {
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
+                  filled: true,
+                  fillColor: Colors.blue[100],
                   contentPadding:
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 ),
@@ -248,6 +255,8 @@ class _AddReminderState extends State<AddReminder> {
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
+                  filled: true,
+                  fillColor: Colors.blue[100],
                   contentPadding:
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 ),
@@ -276,6 +285,8 @@ class _AddReminderState extends State<AddReminder> {
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
+                  filled: true,
+                  fillColor: Colors.blue[100],
                   contentPadding:
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
                 ),
@@ -308,7 +319,7 @@ class _AddReminderState extends State<AddReminder> {
                   ElevatedButton(
                     onPressed: _submitForm,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blueAccent,
+                      backgroundColor: Colors.blue,
                       padding: const EdgeInsets.symmetric(
                           horizontal: 20, vertical: 12),
                       shape: RoundedRectangleBorder(

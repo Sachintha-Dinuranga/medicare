@@ -203,6 +203,7 @@ class _ReminderListState extends State<ReminderList> {
       appBar: AppBar(
         title: const Text('Reminder List'),
         centerTitle: true,
+        backgroundColor: Colors.blue,
       ),
       body: Column(
         children: [
@@ -226,7 +227,7 @@ class _ReminderListState extends State<ReminderList> {
                           color: Colors.black), // Icon color
                       filled: true, // Enable fill
                       fillColor:
-                          Colors.blue[300], // Set background color to blue
+                          Colors.blue[200], // Set background color to blue
                       border: OutlineInputBorder(
                         borderRadius:
                             BorderRadius.circular(20.0), // Rounded corners
