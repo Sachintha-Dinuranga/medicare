@@ -260,9 +260,32 @@ class _FirstScreenState extends State<FirstScreen> {
               child: GestureDetector(
                 onTap: () {
                   setState(() {
-                    _showOverview =
-                        !_showOverview; // Toggle the visibility of cards
+                    _showOverview = !_showOverview;
                   });
+                },
+                child: Opacity(
+                  opacity: 0.4,
+                  child: Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.blue,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Icon(
+                      _showOverview ? Icons.close : Icons.list,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+
+            Positioned(
+              top: 140.0,
+              right: 10.0,
+              child: GestureDetector(
+                onTap: () async {
+                  await _checkPermissionAndGetLocation();
                 },
                 child: Opacity(
                   opacity: 0.4, // Make the button almost transparent
@@ -272,8 +295,31 @@ class _FirstScreenState extends State<FirstScreen> {
                       color: Colors.blue,
                       borderRadius: BorderRadius.circular(20),
                     ),
-                    child: Icon(
-                      _showOverview ? Icons.close : Icons.list,
+                    child: const Icon(
+                      Icons.restore,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+
+            Positioned(
+              top: 200.0,
+              right: 10.0,
+              child: GestureDetector(
+                onTap: () {},
+                onLongPress: () {},
+                child: Opacity(
+                  opacity: 0.4, // Make the button almost transparent
+                  child: Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.blue,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: const Icon(
+                      Icons.save,
                       color: Colors.white,
                     ),
                   ),
