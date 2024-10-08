@@ -32,10 +32,6 @@ class _FirstScreenState extends State<FirstScreen> {
     super.initState();
     _checkPermissionAndGetLocation();
     _loadLocations();
-    if (SavedLocationsPopup.change) {
-      _loadLocations();
-      SavedLocationsPopup.change = false;      
-    }
   }
 
   Future<void> _checkPermissionAndGetLocation() async {
@@ -239,12 +235,6 @@ class _FirstScreenState extends State<FirstScreen> {
 
   void _deleteLocation(int id) {
     DatabaseHelper.instance.deleteLocation(id);
-    _loadLocations();
-  }
-
-  void _addNewLocation(String name) {
-    DatabaseHelper.instance.insertLocation(name, _initialPosition.latitude,
-        _initialPosition.longitude); // Example coordinates (San Francisco)
     _loadLocations();
   }
 
@@ -523,7 +513,6 @@ class SavedLocationsPopup extends StatelessWidget {
   final Function(int, String) onEdit;
   final Function(int) onDelete;
   final VoidCallback onClose;
-  static var change = false;
 
   const SavedLocationsPopup({super.key, 
     required this.locations,
@@ -575,7 +564,7 @@ class SavedLocationsPopup extends StatelessWidget {
                       IconButton(
                         icon: const Icon(Icons.delete, color: Colors.red),
                         onPressed: () =>
-                            {onDelete(locations[index]['id']),onClose},
+                            {onDelete(locations[index]['id'])},
                       ),
                     ],
                   ),
@@ -606,7 +595,6 @@ class SavedLocationsPopup extends StatelessWidget {
             TextButton(
               onPressed: () {
                 onEdit(id, controller.text);
-                change = true;
                 Navigator.of(context).pop();
               },
               child: const Text('Save'),
