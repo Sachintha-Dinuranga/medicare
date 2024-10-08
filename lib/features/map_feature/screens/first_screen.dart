@@ -288,7 +288,7 @@ class _FirstScreenState extends State<FirstScreen> {
                   await _checkPermissionAndGetLocation();
                 },
                 child: Opacity(
-                  opacity: 0.4, // Make the button almost transparent
+                  opacity: 0.4, 
                   child: Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
@@ -311,7 +311,7 @@ class _FirstScreenState extends State<FirstScreen> {
                 onTap: () {},
                 onLongPress: () {},
                 child: Opacity(
-                  opacity: 0.4, // Make the button almost transparent
+                  opacity: 0.4, 
                   child: Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
@@ -327,13 +327,13 @@ class _FirstScreenState extends State<FirstScreen> {
               ),
             ),
 
-            // Horizontally Scrollable Cards
+
             if (_showOverview)
               Positioned(
                 bottom: 0.0,
                 left: 0.0,
                 right: 0.0,
-                height: screenHeight / 3, // 1/3 of screen height
+                height: screenHeight / 3, 
                 child: Container(
                   color: Colors.white.withOpacity(0.9),
                   child: ListView.builder(
@@ -350,16 +350,15 @@ class _FirstScreenState extends State<FirstScreen> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Container(
-                          width: screenWidth * 0.4, // 40% of screen width
+                          width: screenWidth * 0.4, 
                           padding: const EdgeInsets.all(12),
                           child: Column(
                             children: [
-                              // Photo Carousel (Top Half)
                               Expanded(
                                 child: CarouselSlider(
                                   options: CarouselOptions(
                                     height: screenHeight /
-                                        6, // Half of the card height
+                                        6, 
                                     viewportFraction: 1.0,
                                     enlargeCenterPage: true,
                                   ),
