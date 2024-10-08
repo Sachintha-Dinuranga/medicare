@@ -15,7 +15,7 @@ class _FirstScreenState extends State<FirstScreen> {
   late GoogleMapController mapController;
   LatLng _initialPosition = const LatLng(0.0, 0.0);
   bool _locationPermissionGranted = false;
-
+  Marker? _origin;
 
   @override
   void initState() {
@@ -23,12 +23,9 @@ class _FirstScreenState extends State<FirstScreen> {
     _checkPermissionAndGetLocation();
   }
 
-
-   Future<void> _checkPermissionAndGetLocation() async {
-    // Request location permission
+  Future<void> _checkPermissionAndGetLocation() async {
     var status = await Permission.locationWhenInUse.request();
     if (status.isGranted) {
-      // Get the current location
       Position position = await Geolocator.getCurrentPosition(
         locationSettings: const LocationSettings(
           accuracy: LocationAccuracy.high,
@@ -38,11 +35,41 @@ class _FirstScreenState extends State<FirstScreen> {
       setState(() {
         _initialPosition = LatLng(position.latitude, position.longitude);
         _locationPermissionGranted = true;
+        _origin = Marker(
+          markerId: const MarkerId('current-location'),
+          position: _initialPosition,
+          draggable: true,
+          onDragEnd: (newPosition) {
+            setState(() {
+              _initialPosition = newPosition;
+              mapController.animateCamera(CameraUpdate.newLatLng(newPosition));
+            });
+          },
+        );
       });
     } else {
-      // Handle the case where permission is denied
-      print('Location permission denied');
+      _showPermissionDeniedDialog();
     }
+  }
+
+  void _showPermissionDeniedDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Permission Denied'),
+          content: const Text('Location permission is required to use this feature. Please enable it in the app settings.'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -57,7 +84,7 @@ class _FirstScreenState extends State<FirstScreen> {
             fontSize: 24,
             fontWeight: FontWeight.bold,
             color: Colors.white,
-            letterSpacing: 1.5
+            letterSpacing: 1.5,
           ),
         ),
         body: _locationPermissionGranted
@@ -67,6 +94,7 @@ class _FirstScreenState extends State<FirstScreen> {
                   zoom: 14.0,
                 ),
                 myLocationEnabled: true,
+                markers: _origin != null ? {_origin!} : {},
                 onMapCreated: (GoogleMapController controller) {
                   mapController = controller;
                 },
