@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:medicare/features/reminder/home.dart';
+// import 'package:medicare/features/reminder/home.dart';
+import 'package:medicare/features/map_feature/screens/first_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -12,7 +13,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: Home(),
+      home: FirstScreen(),
     );
   }
 }
