@@ -197,6 +197,40 @@ class _ReminderListState extends State<ReminderList> {
     }
   }
 
+  // reminder details aluthin danme
+  void _showReminderDetails(Map<String, dynamic> reminder) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(reminder['name']),
+          content: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                  'Date: ${DateFormat('yyyy-MM-dd').format(DateTime.fromMillisecondsSinceEpoch(reminder['date']))}'),
+              Text(
+                  'Time: ${TimeOfDay(hour: reminder['time']['hour'], minute: reminder['time']['minute']).format(context)}'),
+              Text('Dosage: ${reminder['dosage']}'),
+              Text('Frequency: ${reminder['frequency']}'),
+              Text('Instructions: ${reminder['instructions']}'),
+              Text('Priority: ${reminder['priority']}'),
+            ],
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Close'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -315,46 +349,53 @@ class _ReminderListState extends State<ReminderList> {
                           }
                           return false;
                         },
-                        child: Container(
-                          margin: const EdgeInsets.symmetric(
-                              vertical: 8, horizontal: 16),
-                          decoration: BoxDecoration(
-                            color: Colors
-                                .blue[100], // Light blue color for the tile
-                            borderRadius:
-                                BorderRadius.circular(10), // Rounded corners
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.1),
-                                spreadRadius: 1,
-                                blurRadius: 5,
-                                offset: const Offset(
-                                    0, 3), // changes position of shadow
-                              ),
-                            ],
-                          ),
-                          child: ListTile(
-                            title: Text(
-                              reminder['name'],
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold, // Bold title
-                                color: Colors.blue,
-                              ),
+                        //me kalla aluthin danme
+                        child: GestureDetector(
+                          onTap: () {
+                            _showReminderDetails(
+                                reminder); // Show reminder details
+                          },
+                          child: Container(
+                            margin: const EdgeInsets.symmetric(
+                                vertical: 8, horizontal: 16),
+                            decoration: BoxDecoration(
+                              color: Colors
+                                  .blue[100], // Light blue color for the tile
+                              borderRadius:
+                                  BorderRadius.circular(10), // Rounded corners
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.1),
+                                  spreadRadius: 1,
+                                  blurRadius: 5,
+                                  offset: const Offset(
+                                      0, 3), // changes position of shadow
+                                ),
+                              ],
                             ),
-                            subtitle: Text(
-                              'Date: ${DateFormat('yyyy-MM-dd').format(DateTime.fromMillisecondsSinceEpoch(reminder['date']))} - Time: ${TimeOfDay(hour: reminder['time']['hour'], minute: reminder['time']['minute']).format(context)}',
-                              style: const TextStyle(
-                                  color: Colors
-                                      .black54), // Lighter color for subtitle
-                            ),
-                            trailing: Text(
-                              reminder['priority'],
-                              style: TextStyle(
-                                color: reminder['priority'] == 'High'
-                                    ? Colors.red
-                                    : reminder['priority'] == 'Medium'
-                                        ? Colors.orange
-                                        : Colors.green,
+                            child: ListTile(
+                              title: Text(
+                                reminder['name'],
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold, // Bold title
+                                  color: Colors.blue,
+                                ),
+                              ),
+                              subtitle: Text(
+                                'Date: ${DateFormat('yyyy-MM-dd').format(DateTime.fromMillisecondsSinceEpoch(reminder['date']))} - Time: ${TimeOfDay(hour: reminder['time']['hour'], minute: reminder['time']['minute']).format(context)}',
+                                style: const TextStyle(
+                                    color: Colors
+                                        .black54), // Lighter color for subtitle
+                              ),
+                              trailing: Text(
+                                reminder['priority'],
+                                style: TextStyle(
+                                  color: reminder['priority'] == 'High'
+                                      ? Colors.red
+                                      : reminder['priority'] == 'Medium'
+                                          ? Colors.orange
+                                          : Colors.green,
+                                ),
                               ),
                             ),
                           ),
