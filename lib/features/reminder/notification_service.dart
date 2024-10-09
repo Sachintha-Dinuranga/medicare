@@ -1,4 +1,5 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:logger/logger.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:permission_handler/permission_handler.dart';
@@ -11,13 +12,17 @@ class NotificationService {
   static int _lastNotificationId = 0;
 
   static Future<void> initialize() async {
+    logger.i("Initializing notification service...");
     //request permission for notifications
     await _requestNotificationPermission();
+    logger.i("Notification permission requested");
     // Initialize time zone
     tz.initializeTimeZones();
+    logger.i("Time zone initialized");
 
     const AndroidInitializationSettings initializationSettingsAndroid =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
+        AndroidInitializationSettings(
+            'flutter_logo'); // Change the icon as needed
 
     const InitializationSettings initializationSettings =
         InitializationSettings(
@@ -56,11 +61,12 @@ class NotificationService {
   static Future<void> _createNotificationChannels() async {
     const AndroidNotificationChannel highPriorityChannel =
         AndroidNotificationChannel(
-      'high_priority_channel', // id
-      'High Priority Notifications', // title
-      description: 'This channel is used for high priority notifications.',
-      importance: Importance.max, // Max importance for high priority
-    );
+            'high_priority_channel', // id
+            'High Priority Notifications', // title
+            description:
+                'This channel is used for high priority notifications.',
+            importance: Importance.max // Max importance for high priority
+            );
 
     const AndroidNotificationChannel mediumPriorityChannel =
         AndroidNotificationChannel(
@@ -110,48 +116,56 @@ class NotificationService {
 
     if (priority == 'High') {
       androidPlatformChannelSpecifics = const AndroidNotificationDetails(
-        'high_priority_channel', // Channel ID
-        'High Priority Notifications',
-        importance: Importance.max,
-        priority: Priority.high,
-      );
+          'high_priority_channel', // Channel ID
+          'High Priority Notifications',
+          importance: Importance.max,
+          priority: Priority.high,
+          icon: 'flutter_logo');
     } else if (priority == 'Medium') {
       androidPlatformChannelSpecifics = const AndroidNotificationDetails(
-        'medium_priority_channel', // Channel ID
-        'Medium Priority Notifications',
-        importance: Importance.defaultImportance,
-        priority: Priority.defaultPriority,
-      );
+          'medium_priority_channel', // Channel ID
+          'Medium Priority Notifications',
+          importance: Importance.defaultImportance,
+          priority: Priority.defaultPriority,
+          icon: 'flutter_logo');
     } else {
       androidPlatformChannelSpecifics = const AndroidNotificationDetails(
-        'low_priority_channel', // Channel ID
-        'Low Priority Notifications',
-        importance: Importance.low,
-        priority: Priority.low,
-      );
+          'low_priority_channel', // Channel ID
+          'Low Priority Notifications',
+          importance: Importance.low,
+          priority: Priority.low,
+          icon: 'flutter_logo');
     }
 
     NotificationDetails platformChannelSpecifics =
         NotificationDetails(android: androidPlatformChannelSpecifics);
 
+    // Log notification details before scheduling
+    logger.i(
+        "Scheduling notification with title: $title, body: $body, time: $scheduledTime, priority: $priority");
+
     // Convert DateTime to TZDateTime
     final tz.TZDateTime tzScheduledTime = _convertToTZDateTime(scheduledTime);
-
-    await _flutterLocalNotificationsPlugin.zonedSchedule(
-      notificationId, // Notification ID
-      title,
-      body,
-      tzScheduledTime,
-      platformChannelSpecifics,
-      androidScheduleMode: AndroidScheduleMode
-          .exactAllowWhileIdle, // Updated from androidAllowWhileIdle
-      uiLocalNotificationDateInterpretation:
-          UILocalNotificationDateInterpretation.absoluteTime,
-      matchDateTimeComponents:
-          DateTimeComponents.time, // Notification based on time
-      payload:
-          'Reminder tapped', // Optional: pass a payload to handle tap action
-    );
+    try {
+      await _flutterLocalNotificationsPlugin.zonedSchedule(
+        notificationId, // Notification ID
+        title,
+        body,
+        tzScheduledTime,
+        platformChannelSpecifics,
+        androidScheduleMode: AndroidScheduleMode
+            .exactAllowWhileIdle, // Updated from androidAllowWhileIdle
+        uiLocalNotificationDateInterpretation:
+            UILocalNotificationDateInterpretation.absoluteTime,
+        matchDateTimeComponents:
+            DateTimeComponents.time, // Notification based on time
+        payload:
+            'Reminder tapped', // Optional: pass a payload to handle tap action
+      );
+      logger.i('Notification scheduled successfully');
+    } catch (e) {
+      logger.e("Error sceduling notificatins: $e");
+    }
   }
 
   // This method will be called when a notification is tapped

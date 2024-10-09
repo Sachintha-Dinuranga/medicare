@@ -74,7 +74,10 @@ class _AddReminderState extends State<AddReminder> {
         selectedDate.year,
         selectedDate.month,
         selectedDate.day,
-        selectedTime.hour,
+        selectedTime.hour % 12 +
+            (selectedTime.period == DayPeriod.pm
+                ? 12
+                : 0), // Convert to 24-hour format
         selectedTime.minute,
       );
 
