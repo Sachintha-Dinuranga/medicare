@@ -6,14 +6,16 @@ import 'package:medicare/features/reminder/notification_service.dart';
 // import 'package:shared_preferences/shared_preferences.dart';
 // import 'dart:convert'; // For encoding and decoding JSON
 // import 'package:path_provider/path_provider.dart';
+import 'package:medicare/features/medical/Screens/login_screen.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 void main() async {
+  
   WidgetsFlutterBinding.ensureInitialized();
-
+  await Firebase.initializeApp();
   // Initialize the notification service
   await NotificationService.initialize();
 
-  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -23,7 +25,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: FirstScreen(),
+      home: LoginScreen(),
     );
   }
 }
