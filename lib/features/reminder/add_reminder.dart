@@ -167,7 +167,7 @@ class _AddReminderState extends State<AddReminder> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   filled: true,
-                  fillColor: Colors.blue[100],
+                  fillColor: Colors.blue[50],
                   contentPadding:
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 ),
@@ -192,7 +192,7 @@ class _AddReminderState extends State<AddReminder> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   filled: true,
-                  fillColor: Colors.blue[100],
+                  fillColor: Colors.blue[50],
                   contentPadding:
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 ),
@@ -217,7 +217,7 @@ class _AddReminderState extends State<AddReminder> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   filled: true,
-                  fillColor: Colors.blue[100],
+                  fillColor: Colors.blue[50],
                   contentPadding:
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 ),
@@ -259,7 +259,7 @@ class _AddReminderState extends State<AddReminder> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   filled: true,
-                  fillColor: Colors.blue[100],
+                  fillColor: Colors.blue[50],
                   contentPadding:
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 ),
@@ -289,7 +289,7 @@ class _AddReminderState extends State<AddReminder> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   filled: true,
-                  fillColor: Colors.blue[100],
+                  fillColor: Colors.blue[50],
                   contentPadding:
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
                 ),
