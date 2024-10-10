@@ -14,44 +14,71 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController =
       TextEditingController();
-
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  bool _isLoading = false;
 
-  Future<void> _signUp() async {
-    try {
-      // Create user with email and password using Firebase Auth
-     await _auth.createUserWithEmailAndPassword(
-        email: _emailController.text,
-        password: _passwordController.text,
-      );
-
-      // If successful, show confirmation message and navigate to the login screen
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Sign Up Successful')),
-      );
-
-      // Navigate to login screen or home page after sign-up
-      Navigator.pop(context);
-    } on FirebaseAuthException catch (e) {
-      // Handle errors like email already in use, invalid email, etc.
-      String errorMessage = '';
-
-      if (e.code == 'email-already-in-use') {
-        errorMessage = 'This email is already in use.';
-      } else if (e.code == 'invalid-email') {
-        errorMessage = 'Invalid email address.';
-      } else if (e.code == 'weak-password') {
-        errorMessage = 'The password is too weak.';
-      } else {
-        errorMessage = 'An unknown error occurred.';
-      }
-
-      // Show error message in a SnackBar
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(errorMessage)),
-      );
-    }
+  @override
+  void dispose() {
+    // Dispose controllers to prevent memory leaks
+    _emailController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    super.dispose();
   }
+
+Future<void> _signUp() async {
+  setState(() {
+    _isLoading = true; // Show loading indicator
+  });
+
+  try {
+    // Create user with email and password using Firebase Auth
+    UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
+      email: _emailController.text.trim(),
+      password: _passwordController.text.trim(),
+    );
+
+    // Log user info for debugging
+    User? user = userCredential.user;
+    print('User signed up: ${user?.email}, UID: ${user?.uid}');
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Sign Up Successful')),
+    );
+
+    // Navigate to login screen or home page after successful sign-up
+    Navigator.pop(context);
+  } on FirebaseAuthException catch (e) {
+    String errorMessage = '';
+
+    // Handle specific FirebaseAuth exceptions
+    switch (e.code) {
+      case 'email-already-in-use':
+        errorMessage = 'This email is already in use.';
+        break;
+      case 'invalid-email':
+        errorMessage = 'Invalid email address.';
+        break;
+      case 'weak-password':
+        errorMessage = 'The password is too weak.';
+        break;
+      default:
+        errorMessage = 'An unknown error occurred: ${e.message}';
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(errorMessage)),
+    );
+  } catch (e) {
+    print('Error during sign-up: $e'); // Log any other unexpected errors
+  } finally {
+    setState(() {
+      _isLoading = false; // Hide loading indicator
+      Navigator.pop(context);
+    });
+  }
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -108,10 +135,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       ),
                       keyboardType: TextInputType.emailAddress,
                       validator: (value) {
-                        if (value == null || value.isEmpty) {
+                        if (value == null || value.trim().isEmpty) {
                           return 'Please enter your email';
-                        } else if (!RegExp(r'^[\w-.]+@([\w-]+\.)+[\w-]{2,4}')
-                            .hasMatch(value)) {
+                        } else if (!RegExp(r'^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$')
+                            .hasMatch(value.trim())) {
                           return 'Please enter a valid email';
                         }
                         return null;
@@ -133,10 +160,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       ),
                       obscureText: true,
                       validator: (value) {
-                        if (value == null || value.isEmpty) {
+                        if (value == null || value.trim().isEmpty) {
                           return 'Please enter a password';
                         } else if (value.length < 6) {
                           return 'Password must be at least 6 characters';
+                        } else if (!RegExp(r'[A-Z]').hasMatch(value)) {
+                          return 'Password must contain at least one uppercase letter';
+                        } else if (!RegExp(r'[0-9]').hasMatch(value)) {
+                          return 'Password must contain at least one number';
                         }
                         return null;
                       },
@@ -168,11 +199,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     const SizedBox(height: 30),
                     // Sign Up Button
                     ElevatedButton(
-                      onPressed: () {
-                        if (_formKey.currentState!.validate()) {
-                          _signUp();  // Call the sign-up function
-                        }
-                      },
+                      onPressed: _isLoading
+                          ? null // Disable button while loading
+                          : () {
+                              if (_formKey.currentState!.validate()) {
+                                _signUp(); // Call the sign-up function
+                              }
+                            },
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(
                             vertical: 16, horizontal: 80),
@@ -181,14 +214,18 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      child: const Text(
-                        'Sign Up',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
+                      child: _isLoading
+                          ? const CircularProgressIndicator(
+                              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                            )
+                          : const Text(
+                              'Sign Up',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
                     ),
                   ],
                 ),
