@@ -551,9 +551,8 @@ class SavedLocationsPopup extends StatelessWidget {
   final Function(int) onDelete;
   final Function(LatLng) onGoTo;
   final VoidCallback onClose;
-  final Logger _logger = Logger();
 
-  SavedLocationsPopup({
+  const SavedLocationsPopup({
     super.key,
     required this.locations,
     required this.onEdit,

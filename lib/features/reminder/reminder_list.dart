@@ -9,7 +9,7 @@ class ReminderList extends StatefulWidget {
   const ReminderList({super.key});
 
   @override
-  _ReminderListState createState() => _ReminderListState();
+  State<ReminderList> createState() => _ReminderListState();
 }
 
 class _ReminderListState extends State<ReminderList> {
@@ -131,7 +131,7 @@ class _ReminderListState extends State<ReminderList> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          content: Container(
+          content: SizedBox(
             width: double.maxFinite,
             child: SingleChildScrollView(
               child: Column(
