@@ -1,4 +1,4 @@
 {
-    "cmake.sourceDirectory": "C:/Users/HP/Desktop/proj_ot/UEE/medicare/linux",
-    "java.configuration.updateBuildConfiguration": "interactive"
+    "java.configuration.updateBuildConfiguration": "interactive",
+    "cmake.ignoreCMakeListsMissing": true
 }
