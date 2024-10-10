@@ -38,10 +38,11 @@ class _FirstScreenState extends State<FirstScreen> {
     var status = await Permission.locationWhenInUse.request();
     if (status.isGranted) {
       Position position = await Geolocator.getCurrentPosition(
-        locationSettings: const LocationSettings(
-          accuracy: LocationAccuracy.high,
-          distanceFilter: 10,
-        ),
+        desiredAccuracy: LocationAccuracy.high,
+        // locationSettings: const LocationSettings(
+        //   accuracy: LocationAccuracy.high,
+        //   distanceFilter: 10,
+        // ),
       );
       setState(() {
         _initialPosition = LatLng(position.latitude, position.longitude);
