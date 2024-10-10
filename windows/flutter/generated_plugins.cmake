@@ -3,7 +3,10 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
+<<<<<<< HEAD
   geolocator_windows
+=======
+>>>>>>> origin/sachintha
   permission_handler_windows
 )
 
