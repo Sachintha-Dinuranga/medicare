@@ -6,7 +6,7 @@ class ViewPatientDetailsScreen extends StatefulWidget {
   const ViewPatientDetailsScreen({super.key});
 
   @override
-  _ViewPatientDetailsScreenState createState() => _ViewPatientDetailsScreenState();
+  State<ViewPatientDetailsScreen> createState() => _ViewPatientDetailsScreenState();
 }
 
 class _ViewPatientDetailsScreenState extends State<ViewPatientDetailsScreen> {
