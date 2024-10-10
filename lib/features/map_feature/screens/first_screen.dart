@@ -235,6 +235,7 @@ class _FirstScreenState extends State<FirstScreen> {
 
   void _deleteLocation(int id) {
     DatabaseHelper.instance.deleteLocation(id);
+    Navigator.of(context).pop();
     _loadLocations();
   }
 
@@ -247,10 +248,46 @@ class _FirstScreenState extends State<FirstScreen> {
           onEdit: _editLocation,
           onDelete: _deleteLocation,
           onClose: () => Navigator.of(context).pop(),
+          onGoTo: _goTo,
         );
       },
     );
   }
+
+  void _goTo(LatLng position) {
+  Navigator.of(context).pop();
+
+  // _logger.i('Navigating to position: ${position.latitude}, ${position.longitude}');
+
+  setState(() {
+    if (_origin != null) {
+      // Create a new marker with the updated position
+      _origin = Marker(
+        markerId: _origin!.markerId,
+        position: position, // New position
+        draggable: true,
+        onDragEnd: (newPosition) {
+          setState(() {
+            _origin = _origin!.copyWith(positionParam: newPosition);
+          });
+        },
+      );
+
+      _fetchNearbyHospitals(position);
+
+      // Update the markers set
+      _markers.removeWhere((marker) => marker.markerId == _origin!.markerId);
+      _markers.add(_origin!);
+
+      // Animate camera to new position
+      mapController.animateCamera(CameraUpdate.newLatLng(position));
+
+      // Load locations or perform any other necessary actions
+      _loadLocations();
+    }
+  });
+}
+
 
   // Function to show the long press dialog for adding new location
   void _showAddLocationDialog() {
@@ -294,7 +331,8 @@ class _FirstScreenState extends State<FirstScreen> {
                 } else {
                   // If location name is empty, show a warning
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Location name cannot be empty!')),
+                    const SnackBar(
+                        content: Text('Location name cannot be empty!')),
                   );
                 }
               },
@@ -305,7 +343,6 @@ class _FirstScreenState extends State<FirstScreen> {
       },
     );
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -512,13 +549,17 @@ class SavedLocationsPopup extends StatelessWidget {
   final List<Map<String, dynamic>> locations;
   final Function(int, String) onEdit;
   final Function(int) onDelete;
+  final Function(LatLng) onGoTo;
   final VoidCallback onClose;
+  final Logger _logger = Logger();
 
-  const SavedLocationsPopup({super.key, 
+  SavedLocationsPopup({
+    super.key,
     required this.locations,
     required this.onEdit,
     required this.onDelete,
     required this.onClose,
+    required this.onGoTo,
   });
 
   @override
@@ -549,24 +590,30 @@ class SavedLocationsPopup extends StatelessWidget {
             child: ListView.builder(
               itemCount: locations.length,
               itemBuilder: (context, index) {
-                return ListTile(
-                  title: Text(locations[index]['name']),
-                  subtitle: Text(
-                      'Lat: ${locations[index]['latitude']}, Long: ${locations[index]['longitude']}'),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.edit, color: Colors.blue),
-                        onPressed: () => _editDialog(context,
-                            locations[index]['id'], locations[index]['name']),
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.delete, color: Colors.red),
-                        onPressed: () =>
-                            {onDelete(locations[index]['id'])},
-                      ),
-                    ],
+                return GestureDetector(
+                  onTap: () {
+                    LatLng position = LatLng(locations[index]['latitude'],
+                        locations[index]['longitude']);
+                    onGoTo(position);
+                  },
+                  child: ListTile(
+                    title: Text(locations[index]['name']),
+                    subtitle: Text(
+                        'Lat: ${locations[index]['latitude']}, Long: ${locations[index]['longitude']}'),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.edit, color: Colors.blue),
+                          onPressed: () => _editDialog(context,
+                              locations[index]['id'], locations[index]['name']),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.delete, color: Colors.red),
+                          onPressed: () => {onDelete(locations[index]['id'])},
+                        ),
+                      ],
+                    ),
                   ),
                 );
               },
@@ -579,8 +626,7 @@ class SavedLocationsPopup extends StatelessWidget {
 
   // Function to show edit dialog
   void _editDialog(BuildContext context, int id, String currentName) {
-    TextEditingController controller =
-        TextEditingController(text: currentName);
+    TextEditingController controller = TextEditingController(text: currentName);
 
     showDialog(
       context: context,

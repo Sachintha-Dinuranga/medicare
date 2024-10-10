@@ -48,6 +48,26 @@ class DatabaseHelper {
     return await db.query('locations');
   }
 
+ // Get one location by ID
+Future<Map<String, dynamic>?> getLocationById(int id) async {
+  Database db = await instance.database;
+  
+  // Perform the query to get the location by ID
+  List<Map<String, dynamic>> result = await db.query(
+    'locations',          // Table name
+    where: 'id = ?',       // WHERE clause to match the ID
+    whereArgs: [id],       // Arguments for the WHERE clause
+    limit: 1,              // We only want one result
+  );
+
+  // Check if a result is returned
+  if (result.isNotEmpty) {
+    return result.first;   // Return the first result as a map
+  } else {
+    return null;           // Return null if no location found
+  }
+}
+
   // Update a location by id
   Future<int> updateLocation(int id, String name) async {
     Database db = await instance.database;
