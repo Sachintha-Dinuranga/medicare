@@ -11,12 +11,15 @@ import 'package:firebase_core/firebase_core.dart';
 // import 'package:path_provider/path_provider.dart';
 
 void main() async {
-
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
-  // Initialize the notification service
-  await NotificationService.initialize();
+  try {
+    await Firebase.initializeApp();
+    await NotificationService.initialize();
+  } catch (e) {
+    print('Error initializing Firebase or Notification Service: $e');
+  }
 
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
