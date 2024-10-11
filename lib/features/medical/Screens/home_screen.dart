@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:medicare/features/medical/Screens/patient_details_screen.dart';
-import 'package:medicare/features/medical/Screens/view_patient_details.dart';
+import 'patient_details_screen.dart';
+import 'view_patient_details.dart';
 import 'package:medicare/features/reminder/reminder_list.dart';
 import 'package:medicare/features/map_feature/screens/first_screen.dart';
 
@@ -14,24 +14,46 @@ class HomeScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Home Screen'),
+        title: const Text('Patient Home Screen'),
+        backgroundColor: Colors.blue,
       ),
       body: Center(
-        child: Text('Hello, ${user?.email ?? 'Guest'}!'),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(
+              Icons.medical_services,
+              size: 100,
+              color: Colors.blue,
+            ),
+            const SizedBox(height: 20),
+            Text(
+              'Welcome, ${user?.email ?? 'Guest'}!',
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 10),
+            const Text(
+              'Your Personal Health Management',
+              style: TextStyle(fontSize: 16),
+            ),
+          ],
+        ),
       ),
       drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
+        child: Column(
           children: <Widget>[
-            const DrawerHeader(
-              decoration: BoxDecoration(
+            UserAccountsDrawerHeader(
+              decoration: const BoxDecoration(
                 color: Colors.blue,
               ),
-              child: Text(
-                'Menu',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 24,
+              accountName: Text(user?.displayName ?? 'Patient'),
+              accountEmail: Text(user?.email ?? 'guest@example.com'),
+              currentAccountPicture: const CircleAvatar(
+                backgroundColor: Colors.white,
+                child: Icon(
+                  Icons.person,
+                  size: 50,
+                  color: Colors.blue,
                 ),
               ),
             ),
@@ -65,8 +87,7 @@ class HomeScreen extends StatelessWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                      builder: (context) => const ReminderList()),
+                  MaterialPageRoute(builder: (context) => const ReminderList()),
                 );
               },
             ),
@@ -76,8 +97,7 @@ class HomeScreen extends StatelessWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                      builder: (context) => const FirstScreen()),
+                  MaterialPageRoute(builder: (context) => const FirstScreen()),
                 );
               },
             ),
@@ -88,14 +108,20 @@ class HomeScreen extends StatelessWidget {
                 Navigator.of(context).pushReplacementNamed('/sos');
               },
             ),
+            const Spacer(), // Pushes the logout button to the bottom
+            const Divider(),
             ListTile(
-              leading: const Icon(Icons.logout),
-              title: const Text('Log Out'),
+              leading: const Icon(Icons.logout, color: Colors.red),
+              title: const Text(
+                'Log Out',
+                style: TextStyle(color: Colors.red),
+              ),
               onTap: () async {
                 await FirebaseAuth.instance.signOut();
                 Navigator.of(context).pushReplacementNamed('/');
               },
             ),
+            const SizedBox(height: 20), // Extra spacing at the bottom
           ],
         ),
       ),

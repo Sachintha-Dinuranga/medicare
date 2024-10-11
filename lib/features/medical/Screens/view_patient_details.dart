@@ -72,6 +72,65 @@ class _ViewPatientDetailsScreenState extends State<ViewPatientDetailsScreen> {
     }
   }
 
+  Future<void> _deleteAccount() async {
+    try {
+      // Delete from Firestore
+      if (documentId != null) {
+        await FirebaseFirestore.instance
+            .collection('patients')
+            .doc(documentId)
+            .delete();
+      }
+
+      // Optionally, delete from Firebase Authentication
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        await user.delete(); // Deletes the user from Firebase Auth
+      }
+
+      // After successful deletion, show a success message
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Patient account deleted successfully')),
+      );
+
+      // Navigate back to the login screen or a different screen
+      Navigator.of(context)
+          .pushReplacementNamed('/'); // Adjust as per your app's routing
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error deleting account: $e')),
+      );
+    }
+  }
+
+  Future<void> _showDeleteConfirmationDialog() async {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Delete Profile'),
+          content: const Text(
+              'Are you sure you want to delete your profile? This action cannot be undone.'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('Delete'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                _deleteAccount(); // Call the delete function
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -96,8 +155,8 @@ class _ViewPatientDetailsScreenState extends State<ViewPatientDetailsScreen> {
                           'Date of Birth', patientData!['dob'], Icons.cake),
                       _buildDetailCard(
                           'Email', patientData!['email'], Icons.email),
-                      _buildDetailCard(
-                          'Address', patientData!['address'], Icons.location_on),
+                      _buildDetailCard('Address', patientData!['address'],
+                          Icons.location_on),
                       _buildDetailCard('Allergies', patientData!['allergies'],
                           Icons.warning),
                       _buildDetailCard(
@@ -105,21 +164,31 @@ class _ViewPatientDetailsScreenState extends State<ViewPatientDetailsScreen> {
                       _buildDetailCard('Medical Notes',
                           patientData!['medicalNotes'], Icons.note),
                       const SizedBox(height: 20),
+                      const SizedBox(height: 20),
                       Center(
                         child: ElevatedButton.icon(
                           onPressed: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => GenerateQRScreen(
-                                    patientData: patientData!),
+                                builder: (context) =>
+                                    GenerateQRScreen(patientData: patientData!),
                               ),
                             );
                           },
                           icon: const Icon(Icons.qr_code),
                           label: const Text('Generate QR Code'),
                           style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.blue),
+                            side: const BorderSide(
+                                color: Colors.blue, width: 2), // Blue border
+                            shape: RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.circular(20), // Rounded corners
+                            ),
+                            backgroundColor: Colors.white, // White background
+                            foregroundColor:
+                                Colors.blue, // Blue text/icon color
+                          ),
                         ),
                       ),
                       const SizedBox(height: 20),
@@ -129,7 +198,16 @@ class _ViewPatientDetailsScreenState extends State<ViewPatientDetailsScreen> {
                           icon: const Icon(Icons.qr_code_scanner),
                           label: const Text('Scan QR Code'),
                           style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.blue),
+                            side: const BorderSide(
+                                color: Colors.blue, width: 2), // Blue border
+                            shape: RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.circular(20), // Rounded corners
+                            ),
+                            backgroundColor: Colors.white, // White background
+                            foregroundColor:
+                                Colors.blue, // Blue text/icon color
+                          ),
                         ),
                       ),
                       const SizedBox(height: 20),
@@ -149,7 +227,44 @@ class _ViewPatientDetailsScreenState extends State<ViewPatientDetailsScreen> {
                           icon: const Icon(Icons.edit),
                           label: const Text('Edit Details'),
                           style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.blue),
+                            side: const BorderSide(
+                                color: Colors.blue, width: 2), // Blue border
+                            shape: RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.circular(20), // Rounded corners
+                            ),
+                            backgroundColor: Colors.white, // White background
+                            foregroundColor:
+                                Colors.blue, // Blue text/icon color
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      Center(
+                        child: GestureDetector(
+                          onTap: () {
+                            _showDeleteConfirmationDialog(); // Trigger the delete confirmation dialog
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 8),
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: Colors.red, // Red border
+                                width: 2, // Border width
+                              ),
+                              borderRadius: BorderRadius.circular(
+                                  20), // More rounded corners
+                            ),
+                            child: const Text(
+                              'Delete Profile',
+                              style: TextStyle(
+                                color: Colors.red,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
                         ),
                       ),
                     ],
@@ -212,7 +327,6 @@ class _ViewPatientDetailsScreenState extends State<ViewPatientDetailsScreen> {
     );
   }
 }
-
 
 // New screen to display scanned QR code data
 class ScannedDataScreen extends StatelessWidget {

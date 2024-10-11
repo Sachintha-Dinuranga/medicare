@@ -93,14 +93,42 @@ class _ReminderListState extends State<ReminderList> {
   }
 
   // Method to filter reminders based on search query
+  // List<Map<String, dynamic>> get filteredReminders {
+  //   if (selectedDate != null) {
+  //     return filteredDateReminders;
+  //   }
+  //   if (searchQuery.isEmpty) {
+  //     return reminders;
+  //   } else {
+  //     return reminders.where((reminder) {
+  //       return reminder['name']
+  //               .toLowerCase()
+  //               .contains(searchQuery.toLowerCase()) ||
+  //           reminder['instructions']
+  //               .toLowerCase()
+  //               .contains(searchQuery.toLowerCase());
+  //     }).toList();
+  //   }
+  // }
+
+
+    // Method to filter reminders based on search query and sort by priority
   List<Map<String, dynamic>> get filteredReminders {
-    if (selectedDate != null) {
-      return filteredDateReminders;
-    }
+    // Sort reminders by priority before returning
+    List<Map<String, dynamic>> sortedReminders = List.from(
+      selectedDate != null ? filteredDateReminders : reminders,
+    );
+
+    sortedReminders.sort((a, b) {
+      const priorityOrder = {'High': 1, 'Medium': 2, 'Low': 3};
+      return priorityOrder[a['priority']]!
+          .compareTo(priorityOrder[b['priority']]!);
+    });
+
     if (searchQuery.isEmpty) {
-      return reminders;
+      return sortedReminders;
     } else {
-      return reminders.where((reminder) {
+      return sortedReminders.where((reminder) {
         return reminder['name']
                 .toLowerCase()
                 .contains(searchQuery.toLowerCase()) ||
@@ -110,6 +138,7 @@ class _ReminderListState extends State<ReminderList> {
       }).toList();
     }
   }
+
 
 // Method to filter reminders based on selected date
   void _filterRemindersByDate(DateTime selectedDate) {
