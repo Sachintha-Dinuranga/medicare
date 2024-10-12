@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert'; // For encoding and decoding JSON
 import 'package:intl/intl.dart';
-import 'package:medicare/features/reminder/add_reminder.dart';
+import 'add_reminder.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class ReminderList extends StatefulWidget {

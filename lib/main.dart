@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:medicare/features/reminder/notification_service.dart';
-import 'package:medicare/features/medical/Screens/login_screen.dart';
+import './features/reminder/notification_service.dart';
+import './features/medical/Screens/login_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 // import 'package:medicare/features/reminder/home.dart';

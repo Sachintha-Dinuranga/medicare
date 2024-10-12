@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:medicare/features/reminder/notification_service.dart';
+import 'notification_service.dart';
 // import 'package:shared_preferences/shared_preferences.dart';
 // import 'dart:convert'; // For encoding and decoding JSON
 // import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';

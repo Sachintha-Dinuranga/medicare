@@ -56,7 +56,6 @@ dependencies:
   http: ^1.2.2
   logger: ^2.4.0
   carousel_slider: ^5.0.0
-  shared_preferences: ^2.3.2
   sqflite: ^2.0.0+4
   path: ^1.8.0
   # flutter_datetime_picker_plus: ^2.2.0

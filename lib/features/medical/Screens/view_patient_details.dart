@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:barcode_scan2/barcode_scan2.dart'; // For scanning QR codes
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:medicare/features/medical/Screens/edit_patient_Screen.dart';
-import 'package:medicare/features/medical/Screens/generate_qr_code.dart';
+import 'edit_patient_Screen.dart';
+import 'generate_qr_code.dart';
 
 class ViewPatientDetailsScreen extends StatefulWidget {
   const ViewPatientDetailsScreen({super.key});

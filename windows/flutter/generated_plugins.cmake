@@ -3,19 +3,14 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
-<<<<<<< HEAD
+  audioplayers_windows
   cloud_firestore
+  file_selector_windows
   firebase_auth
   firebase_core
   geolocator_windows
   permission_handler_windows
-=======
-  audioplayers_windows
-  file_selector_windows
-  geolocator_windows
-  permission_handler_windows
   url_launcher_windows
->>>>>>> origin/hasindu
 )
 
 list(APPEND FLUTTER_FFI_PLUGIN_LIST

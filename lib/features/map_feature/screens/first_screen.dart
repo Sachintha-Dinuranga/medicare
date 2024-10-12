@@ -6,7 +6,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:logger/logger.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:medicare/features/map_feature/database_helper.dart';
+import '../database_helper.dart';
 
 class FirstScreen extends StatefulWidget {
   const FirstScreen({super.key});

@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'patient_details_screen.dart';
 import 'view_patient_details.dart';
-import 'package:medicare/features/reminder/reminder_list.dart';
-import 'package:medicare/features/map_feature/screens/first_screen.dart';
+import '../../reminder/reminder_list.dart';
+import '../../map_feature/screens/first_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
