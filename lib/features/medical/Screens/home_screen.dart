@@ -105,27 +105,33 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   const SizedBox(height: 40),
                   if (patientData != null) ...[
-                    ElevatedButton.icon(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                GenerateQRScreen(patientData: patientData!),
+                    SizedBox(
+                      width: MediaQuery.of(context).size.width *
+                          (2 / 3), // 2/3 of the screen width
+                      height: MediaQuery.of(context).size.height *
+                          (1 / 7), // 1/5 of the screen height
+                      child: ElevatedButton.icon(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  GenerateQRScreen(patientData: patientData!),
+                            ),
+                          );
+                        },
+                        icon: const Icon(Icons.qr_code),
+                        label: const Text('Generate QR Code'),
+                        style: ElevatedButton.styleFrom(
+                          side: const BorderSide(
+                              color: Colors.blue, width: 2), // Blue border
+                          shape: RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.circular(20), // Rounded corners
                           ),
-                        );
-                      },
-                      icon: const Icon(Icons.qr_code),
-                      label: const Text('Generate QR Code'),
-                      style: ElevatedButton.styleFrom(
-                        side: const BorderSide(
-                            color: Colors.blue, width: 2), // Blue border
-                        shape: RoundedRectangleBorder(
-                          borderRadius:
-                              BorderRadius.circular(20), // Rounded corners
+                          backgroundColor: Colors.white, // White background
+                          foregroundColor: Colors.blue, // Blue text/icon color
                         ),
-                        backgroundColor: Colors.white, // White background
-                        foregroundColor: Colors.blue, // Blue text/icon color
                       ),
                     ),
                   ] else ...[
@@ -133,7 +139,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       width: MediaQuery.of(context).size.width *
                           (2 / 3), // 2/3 of the screen width
                       height: MediaQuery.of(context).size.height *
-                          (1 / 5), // 1/5 of the screen height
+                          (1 / 7), // 1/5 of the screen height
                       child: ElevatedButton.icon(
                         onPressed: () {
                           Navigator.push(
@@ -161,21 +167,30 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     )
                   ],
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      _scanQR(context);
-                    },
-                    icon: const Icon(Icons.qr_code_scanner),
-                    label: const Text('Scan QR Code'),
-                    style: ElevatedButton.styleFrom(
-                      side: const BorderSide(
-                          color: Colors.blue, width: 2), // Blue border
-                      shape: RoundedRectangleBorder(
-                        borderRadius:
-                            BorderRadius.circular(20), // Rounded corners
+                  SizedBox(
+                    height: 60,
+                  ),
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width *
+                        (2 / 3), // 2/3 of the screen width
+                    height: MediaQuery.of(context).size.height *
+                        (1 / 7), // 1/5 of the screen height
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        _scanQR(context);
+                      },
+                      icon: const Icon(Icons.qr_code_scanner),
+                      label: const Text('Scan QR Code'),
+                      style: ElevatedButton.styleFrom(
+                        side: const BorderSide(
+                            color: Colors.blue, width: 2), // Blue border
+                        shape: RoundedRectangleBorder(
+                          borderRadius:
+                              BorderRadius.circular(20), // Rounded corners
+                        ),
+                        backgroundColor: Colors.white, // White background
+                        foregroundColor: Colors.blue, // Blue text/icon color
                       ),
-                      backgroundColor: Colors.white, // White background
-                      foregroundColor: Colors.blue, // Blue text/icon color
                     ),
                   ),
                 ],
