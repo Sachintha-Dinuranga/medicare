@@ -30,10 +30,6 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-<<<<<<< HEAD
-=======
-  geolocator: ^13.0.1
-  permission_handler: ^11.3.1
   shared_preferences: ^2.3.2
   font_awesome_flutter: ^10.7.0
   flutter_map: ^7.0.2
@@ -50,7 +46,6 @@ dependencies:
   fluttertoast: ^8.2.8
   path_provider: ^2.1.4
   awesome_snackbar_content: ^0.1.4
->>>>>>> origin/hasindu
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -64,10 +59,8 @@ dependencies:
   shared_preferences: ^2.3.2
   sqflite: ^2.0.0+4
   path: ^1.8.0
-  intl: ^0.19.0
   # flutter_datetime_picker_plus: ^2.2.0
   flutter_datetime_picker: ^1.5.1
-  path_provider: ^2.1.4
   table_calendar: ^3.1.2
   flutter_local_notifications: ^17.2.3
   timezone: ^0.9.4
@@ -94,12 +87,9 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
-<<<<<<< HEAD
-=======
   assets:
     - assets/images/uee_logo.png
     - assets/sounds/beep.mp3
->>>>>>> origin/hasindu
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
