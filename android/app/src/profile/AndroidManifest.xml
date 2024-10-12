@@ -3,5 +3,10 @@
          the Flutter tool needs it to communicate with the running application
          to allow setting breakpoints, to provide hot reload, etc.
     -->
+      <uses-permission android:name="android.permission.CALL_PHONE"/>
+      <uses-permission android:name="android.permission.SEND_SMS" />
+<uses-permission android:name="android.permission.RECEIVE_SMS" />
+<uses-permission android:name="android.permission.READ_SMS" />
+
     <uses-permission android:name="android.permission.INTERNET"/>
 </manifest>
