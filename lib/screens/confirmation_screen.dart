@@ -1,7 +1,4 @@
-import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vibration/vibration.dart';
 
@@ -16,7 +13,7 @@ class ConfirmationScreen extends StatefulWidget {
     required this.latitude,
     required this.longitude,
   });
-
+  
   @override
   _ConfirmationScreenState createState() => _ConfirmationScreenState();
 }

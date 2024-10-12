@@ -338,7 +338,6 @@ class _SosScreenContentState extends State<SosScreenContent>
         showDialog(
           context: context,
           builder: (BuildContext context) {
-            assert(context != null);
             return Center(
               child: Container(
                 padding: const EdgeInsets.all(20),
@@ -606,7 +605,7 @@ class _SosScreenContentState extends State<SosScreenContent>
                             ),
                           )
                         : Text(
-                            widget.location!, // Check for null before accessing
+                            widget.location, // Check for null before accessing
                             style: const TextStyle(
                               fontSize: 14,
                               color: Colors.black54,
