@@ -21,7 +21,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    _fetchPatientDetails(); 
+    _fetchPatientDetails();
   }
 
   Future<void> _fetchPatientDetails() async {
@@ -105,7 +105,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   const SizedBox(height: 40),
                   if (patientData != null) ...[
-                    ElevatedButton(
+                    ElevatedButton.icon(
                       onPressed: () {
                         Navigator.push(
                           context,
@@ -115,27 +115,68 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         );
                       },
-                      child: const Text('Generate QR Code'),
+                      icon: const Icon(Icons.qr_code),
+                      label: const Text('Generate QR Code'),
+                      style: ElevatedButton.styleFrom(
+                        side: const BorderSide(
+                            color: Colors.blue, width: 2), // Blue border
+                        shape: RoundedRectangleBorder(
+                          borderRadius:
+                              BorderRadius.circular(20), // Rounded corners
+                        ),
+                        backgroundColor: Colors.white, // White background
+                        foregroundColor: Colors.blue, // Blue text/icon color
+                      ),
                     ),
                   ] else ...[
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                const AddPatientDetailsScreen(),
+                    SizedBox(
+                      width: MediaQuery.of(context).size.width *
+                          (2 / 3), // 2/3 of the screen width
+                      height: MediaQuery.of(context).size.height *
+                          (1 / 5), // 1/5 of the screen height
+                      child: ElevatedButton.icon(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  const AddPatientDetailsScreen(),
+                            ),
+                          );
+                        },
+                        icon: const Icon(Icons.person_add),
+                        label: const Text('Add patient details'),
+                        style: ElevatedButton.styleFrom(
+                          side: const BorderSide(
+                            color: Colors.blue,
+                            width: 2, // Blue border
                           ),
-                        );
-                      },
-                      child: const Text('Add Patient Details'),
-                    ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.circular(20), // Rounded corners
+                          ),
+                          backgroundColor: Colors.white, // White background
+                          foregroundColor: Colors.blue, // Blue text/icon color
+                        ),
+                      ),
+                    )
                   ],
-                  ElevatedButton(
+                  ElevatedButton.icon(
                     onPressed: () {
                       _scanQR(context);
                     },
-                    child: const Text('Scan QR Code'),
+                    icon: const Icon(Icons.qr_code_scanner),
+                    label: const Text('Scan QR Code'),
+                    style: ElevatedButton.styleFrom(
+                      side: const BorderSide(
+                          color: Colors.blue, width: 2), // Blue border
+                      shape: RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.circular(20), // Rounded corners
+                      ),
+                      backgroundColor: Colors.white, // White background
+                      foregroundColor: Colors.blue, // Blue text/icon color
+                    ),
                   ),
                 ],
               ),
@@ -164,8 +205,7 @@ class _HomeScreenState extends State<HomeScreen> {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                      builder: (context) => HomeScreen()),
+                  MaterialPageRoute(builder: (context) => HomeScreen()),
                 );
               },
             ),
