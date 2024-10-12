@@ -42,7 +42,7 @@
     <!-- Optional: If you need background location access -->
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
     <application
-        android:label="ueehe"
+        android:label="Medicare"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
 

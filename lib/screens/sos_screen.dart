@@ -146,10 +146,28 @@ class _SosScreenState extends State<SosScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('SOS'),
+        backgroundColor: Colors.blue,
+        centerTitle: true,
+        titleTextStyle: const TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+            letterSpacing: 1.5,
+          ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.notifications_none),
+            onPressed: () {
+              // Navigate to notifications screen
+            },
+          ),
+        ],
+      ),
       body: SafeArea(
         child: _screens[_selectedIndex], // Display the selected screen
-      ),
-      drawer: _buildDrawer(), // Add the drawer here
+      ),// Add the drawer here
       bottomNavigationBar: CustomBottomNavigationBar(
         selectedIndex: _selectedIndex, // Pass the current index
         onTabSelected: _onTabSelected, // Pass the tab selection callback
@@ -165,7 +183,7 @@ class _SosScreenState extends State<SosScreen>
         children: <Widget>[
           DrawerHeader(
             decoration: BoxDecoration(
-              color: Colors.redAccent,
+              color: Colors.blue,
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -352,7 +370,7 @@ class _SosScreenContentState extends State<SosScreenContent>
                         child: const Icon(
                           Icons.close, // Error close icon
                           size: 30,
-                          color: Colors.redAccent, // Pink accent for the icon
+                          color: Colors.blue, // Pink accent for the icon
                         ),
                       ),
                       const SizedBox(height: 20),
@@ -385,7 +403,7 @@ class _SosScreenContentState extends State<SosScreenContent>
                           Navigator.of(context).pop(); // Close the dialog
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.redAccent, // Button color
+                          backgroundColor: Colors.blue, // Button color
                           shape: RoundedRectangleBorder(
                             borderRadius:
                                 BorderRadius.circular(30), // Rounded button
@@ -418,7 +436,7 @@ class _SosScreenContentState extends State<SosScreenContent>
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text("Error: $e"),
-          backgroundColor: Colors.redAccent,
+          backgroundColor: Colors.blue,
         ),
       );
     }
@@ -439,54 +457,54 @@ class _SosScreenContentState extends State<SosScreenContent>
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              IconButton(
-                icon: const Icon(Icons.menu, size: 28, color: Colors.black54),
-                onPressed: () {
-                  Scaffold.of(context).openDrawer(); // Open the side drawer
-                },
-              ),
-              FutureBuilder<String>(
-                future: SharedPreferences.getInstance().then((prefs) {
-                  return 'Hello, ${prefs.getString('name') ?? 'there'}';
-                }),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Text(
-                      'Loading...',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.black87,
-                      ),
-                    );
-                  } else if (snapshot.hasError) {
-                    return const Text(
-                      'Error',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.black87,
-                      ),
-                    );
-                  } else {
-                    return Text(
-                      snapshot.data ?? '',
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.black87,
-                      ),
-                    );
-                  }
-                },
-              ),
-              IconButton(
-                icon: const Icon(Icons.notifications_none,
-                    size: 28, color: Colors.redAccent),
-                onPressed: () {},
-              ),
-            ],
+            // children: [
+            //   IconButton(
+            //     icon: const Icon(Icons.menu, size: 28, color: Colors.black54),
+            //     onPressed: () {
+            //       Scaffold.of(context).openDrawer(); // Open the side drawer
+            //     },
+            //   ),
+            //   FutureBuilder<String>(
+            //     future: SharedPreferences.getInstance().then((prefs) {
+            //       return 'Hello, ${prefs.getString('name') ?? 'there'}';
+            //     }),
+            //     builder: (context, snapshot) {
+            //       if (snapshot.connectionState == ConnectionState.waiting) {
+            //         return const Text(
+            //           'Loading...',
+            //           style: TextStyle(
+            //             fontSize: 16,
+            //             fontWeight: FontWeight.w500,
+            //             color: Colors.black87,
+            //           ),
+            //         );
+            //       } else if (snapshot.hasError) {
+            //         return const Text(
+            //           'Error',
+            //           style: TextStyle(
+            //             fontSize: 16,
+            //             fontWeight: FontWeight.w500,
+            //             color: Colors.black87,
+            //           ),
+            //         );
+            //       } else {
+            //         return Text(
+            //           snapshot.data ?? '',
+            //           style: const TextStyle(
+            //             fontSize: 16,
+            //             fontWeight: FontWeight.w500,
+            //             color: Colors.black87,
+            //           ),
+            //         );
+            //       }
+            //     },
+            //   ),
+            //   IconButton(
+            //     icon: const Icon(Icons.notifications_none,
+            //         size: 28, color: Colors.blue),
+            //     onPressed: () {},
+            //   ),
+            // ],
           ),
         ),
         const SizedBox(height: 20),
@@ -525,13 +543,13 @@ class _SosScreenContentState extends State<SosScreenContent>
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     gradient: const LinearGradient(
-                      colors: [Colors.redAccent, Colors.red],
+                      colors: [Colors.blue, Colors.blueAccent],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.redAccent.withOpacity(0.5),
+                        color: Colors.blue.withOpacity(0.5),
                         spreadRadius: 5,
                         blurRadius: 10,
                         offset: const Offset(0, 3),
@@ -565,7 +583,7 @@ class _SosScreenContentState extends State<SosScreenContent>
           child: Row(
             children: [
               const Icon(FontAwesomeIcons.mapMarkerAlt,
-                  color: Colors.redAccent),
+                  color: Colors.blue),
               const SizedBox(width: 10),
               Expanded(
                 child: Column(
@@ -612,20 +630,20 @@ class _SosScreenContentState extends State<SosScreenContent>
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
-                side: const BorderSide(color: Colors.redAccent, width: 2),
+                side: const BorderSide(color: Colors.blue, width: 2),
               ),
             ),
             child: Row(
               mainAxisAlignment:
                   MainAxisAlignment.center, // Center the content horizontally
               children: [
-                const Icon(FontAwesomeIcons.ambulance, color: Colors.redAccent),
+                const Icon(FontAwesomeIcons.ambulance, color: Colors.blue),
                 const SizedBox(
                     width: 10), // Adjust spacing between icon and text
                 const Text(
                   "Call 1990 සුව සැරිය  ", // Check for null before accessing
                   style: TextStyle(
-                    color: Colors.redAccent,
+                    color: Colors.blue,
                     fontWeight: FontWeight.bold,
                     fontSize: 18,
                   ),

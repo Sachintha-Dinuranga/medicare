@@ -353,9 +353,9 @@ class _FirstScreenState extends State<FirstScreen> {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('First Screen'),
+          title: const Text('Doctor finder'),
           centerTitle: true,
-          backgroundColor: Colors.blueAccent,
+          backgroundColor: Colors.blue,
           titleTextStyle: const TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
@@ -460,7 +460,7 @@ class _FirstScreenState extends State<FirstScreen> {
                 right: 0.0,
                 height: screenHeight / 3,
                 child: Container(
-                  color: Colors.white.withOpacity(0.9),
+                  color: Colors.blue.withOpacity(0.3),
                   child: ListView.builder(
                     scrollDirection: Axis.horizontal,
                     itemCount: _locationSummaries.length,

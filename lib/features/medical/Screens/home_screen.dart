@@ -4,6 +4,7 @@ import 'patient_details_screen.dart';
 import 'view_patient_details.dart';
 import '../../reminder/reminder_list.dart';
 import '../../map_feature/screens/first_screen.dart';
+import '../../../screens/sos_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -105,7 +106,10 @@ class HomeScreen extends StatelessWidget {
               leading: const Icon(Icons.sos),
               title: const Text('SOS'),
               onTap: () {
-                Navigator.of(context).pushReplacementNamed('/sos');
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const SosScreen()),
+                );
               },
             ),
             const Spacer(), // Pushes the logout button to the bottom

@@ -31,7 +31,7 @@ class CustomBottomNavigationBar extends StatelessWidget {
         backgroundColor:
             Colors.transparent, // Keeps it transparent to reveal body content
         color: Colors
-            .redAccent, // Background color of the curved bar        buttonBackgroundColor: const Color.fromARGB(255, 175, 128, 125), // Color of the center button
+            .blue, // Background color of the curved bar        buttonBackgroundColor: const Color.fromARGB(255, 175, 128, 125), // Color of the center button
         animationDuration:
             const Duration(milliseconds: 300), // Animation duration
         animationCurve: Curves.easeInOut, // Animation curve for smooth effect
