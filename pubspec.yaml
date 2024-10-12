@@ -68,6 +68,7 @@ dependencies:
   cloud_firestore: ^4.17.5
   qr_flutter: ^4.1.0
   barcode_scan2: ^4.3.3
+  flutter_launcher_icons: ^0.14.1
 
 
 dev_dependencies:
@@ -87,6 +88,7 @@ dev_dependencies:
 # The following section is specific to Flutter packages.
 flutter:
   assets:
+    - assets/images/ap_icn.png
     - assets/images/uee_logo.png
     - assets/sounds/beep.mp3
   # The following line ensures that the Material Icons font is
@@ -94,6 +96,9 @@ flutter:
   # the material Icons class.
   uses-material-design: true
 
+flutter_launcher_icons:
+  android: true
+  image_path: "assets/images/ap_icn.png" 
   # To add assets to your application, add an assets section, like this:
 
   # To add assets to your application, add an assets section, like this:

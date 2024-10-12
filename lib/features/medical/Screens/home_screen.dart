@@ -1,13 +1,76 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:barcode_scan2/barcode_scan2.dart';
 import 'patient_details_screen.dart';
 import 'view_patient_details.dart';
 import '../../reminder/reminder_list.dart';
 import '../../map_feature/screens/first_screen.dart';
 import '../../../screens/sos_screen.dart';
+import 'generate_qr_code.dart';
 
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+class HomeScreen extends StatefulWidget {
+  @override
+  _HomeScreenState createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  Map<String, dynamic>? patientData;
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchPatientDetails(); 
+  }
+
+  Future<void> _fetchPatientDetails() async {
+    User? user = FirebaseAuth.instance.currentUser;
+
+    if (user != null) {
+      try {
+        QuerySnapshot snapshot = await FirebaseFirestore.instance
+            .collection('patients')
+            .where('email', isEqualTo: user.email)
+            .get();
+
+        if (snapshot.docs.isNotEmpty) {
+          setState(() {
+            patientData = snapshot.docs[0].data() as Map<String, dynamic>;
+            isLoading = false;
+          });
+        } else {
+          setState(() {
+            patientData = null;
+            isLoading = false;
+          });
+        }
+      } catch (e) {
+        print(e);
+        setState(() {
+          isLoading = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _scanQR(BuildContext context) async {
+    try {
+      var result = await BarcodeScanner.scan(); // Start scanning
+      String scannedQrData = result.rawContent; // Store scanned data
+      // Navigate to ScannedDataScreen with scanned data
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ScannedDataScreen(scannedData: scannedQrData),
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to scan QR code: $e')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -18,28 +81,65 @@ class HomeScreen extends StatelessWidget {
         title: const Text('Patient Home Screen'),
         backgroundColor: Colors.blue,
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(
-              Icons.medical_services,
-              size: 100,
-              color: Colors.blue,
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator()) // Show loader
+          : Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(
+                    Icons.medical_services,
+                    size: 100,
+                    color: Colors.blue,
+                  ),
+                  const SizedBox(height: 20),
+                  Text(
+                    'Welcome, ${user?.email ?? 'Guest'}!',
+                    style: const TextStyle(
+                        fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 10),
+                  const Text(
+                    'Your Personal Health Management',
+                    style: TextStyle(fontSize: 16),
+                  ),
+                  const SizedBox(height: 40),
+                  if (patientData != null) ...[
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                GenerateQRScreen(patientData: patientData!),
+                          ),
+                        );
+                      },
+                      child: const Text('Generate QR Code'),
+                    ),
+                  ] else ...[
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                const AddPatientDetailsScreen(),
+                          ),
+                        );
+                      },
+                      child: const Text('Add Patient Details'),
+                    ),
+                  ],
+                  ElevatedButton(
+                    onPressed: () {
+                      _scanQR(context);
+                    },
+                    child: const Text('Scan QR Code'),
+                  ),
+                ],
+              ),
             ),
-            const SizedBox(height: 20),
-            Text(
-              'Welcome, ${user?.email ?? 'Guest'}!',
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 10),
-            const Text(
-              'Your Personal Health Management',
-              style: TextStyle(fontSize: 16),
-            ),
-          ],
-        ),
-      ),
       drawer: Drawer(
         child: Column(
           children: <Widget>[
@@ -59,10 +159,20 @@ class HomeScreen extends StatelessWidget {
               ),
             ),
             ListTile(
+              leading: const Icon(Icons.home),
+              title: const Text('Home'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => HomeScreen()),
+                );
+              },
+            ),
+            ListTile(
               leading: const Icon(Icons.person_add),
               title: const Text('Add Patient Details'),
               onTap: () {
-                // Navigate to PatientDetailsScreen
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -74,7 +184,6 @@ class HomeScreen extends StatelessWidget {
               leading: const Icon(Icons.person_rounded),
               title: const Text('View Patient Details'),
               onTap: () {
-                // Navigate to PatientDetailsScreen
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -112,7 +221,7 @@ class HomeScreen extends StatelessWidget {
                 );
               },
             ),
-            const Spacer(), // Pushes the logout button to the bottom
+            const Spacer(),
             const Divider(),
             ListTile(
               leading: const Icon(Icons.logout, color: Colors.red),
@@ -125,7 +234,7 @@ class HomeScreen extends StatelessWidget {
                 Navigator.of(context).pushReplacementNamed('/');
               },
             ),
-            const SizedBox(height: 20), // Extra spacing at the bottom
+            const SizedBox(height: 20),
           ],
         ),
       ),
