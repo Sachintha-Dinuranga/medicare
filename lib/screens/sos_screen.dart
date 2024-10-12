@@ -32,7 +32,7 @@ class _SosScreenState extends State<SosScreen>
 
   late AnimationController
       _controller; // Controller for the breathing animation
-  late Animation<double> _animation; // Animation value for scaling
+  //late Animation<double> _animation; // Animation value for scaling
 
   @override
   void initState() {
@@ -55,9 +55,9 @@ class _SosScreenState extends State<SosScreen>
     )..repeat(reverse: true); // Repeat the animation (breathing effect)
 
     // Tween to scale between 0.9x and 1.0x
-    _animation = Tween<double>(begin: 0.9, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
+    // _animation = Tween<double>(begin: 0.9, end: 1.0).animate(
+    //   CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    // );
   }
 
   @override
@@ -581,7 +581,7 @@ class _SosScreenContentState extends State<SosScreenContent>
           ),
           child: Row(
             children: [
-              const Icon(FontAwesomeIcons.mapMarkerAlt,
+              const Icon(FontAwesomeIcons.locationDot,
                   color: Colors.blue),
               const SizedBox(width: 10),
               Expanded(
